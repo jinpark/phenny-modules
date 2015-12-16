@@ -70,7 +70,7 @@ def tr(jenni, input):
         return p.startswith(':') and (2 < len(p) < 10) and p[1:].isalpha()
 
     for i in range(2):
-        if not ' ' in command: break
+        if not ' '.encode('utf-8') in command: break
         prefix, cmd = command.split(' ', 1)
         if langcode(prefix):
             args[i] = prefix[1:]
