@@ -219,6 +219,7 @@ def weather_forecast(bot, trigger):
     except:
         location = ''
     woeid = ''
+    units = 'si'
     nick = trigger.nick.lower()
     if not location:
         woeid = bot.db.get_nick_value(nick, 'woeid')
@@ -307,13 +308,13 @@ def weabase(bot, latitude, longitude, location, units='si'):
         deg = degf
         opp_deg = defc
         windspeedunits = "mph"
-        opp_windspeedunits = "km/h"
+        opp_windspeedunits = "m/s"
     else:
         deg = degc
         opp_deg = degf
-        windspeedunits = "km/h"
+        windspeedunits = "m/s"
         opp_windspeedunits = "mph"
-    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(kmh_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
+    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
 
 def wfbase(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
@@ -344,8 +345,8 @@ def old_wea(woeid):
 def c_to_f(temp):
     return temp * 1.8 + 32
 
-def kmh_to_mph(speed):
-    return speed * 0.621371
+def ms_to_mph(speed):
+    return speed * 2.23694
 
 def get_timezone(bot, lat, lon):
     timezonedb_url = "http://ws.geonames.org/timezoneJSON?lat={}&lng={}&username={}".format(lat, lon, bot.config.apikeys.geonames_username)

@@ -30,14 +30,14 @@ def ud(bot, trigger):
     try:
         json_response = requests.get(url).json()
         num_def = len(json_response['list'])
-        defin = "({}/{}) {}: {}".format(page_num + 1, num_def, json_response['list'][page_num]['word'], json_response['list'][page_num]['definition'])
+        defin = "({}/{}) ({}↑/{}↓) {}: {}".format(page_num + 1, num_def, json_response['list'][page_num]['thumbs_up'], json_response['list'][page_num]['thumbs_down'], json_response['list'][page_num]['word'], json_response['list'][page_num]['definition'])
         permalink = json_response['list'][page_num]['permalink']
     except:
         defin = 'Bob broke something.'
     defin = defin.replace('\r\n', ' ').replace('[word]', ' ').replace('[/word]', ' ')
-    if len(defin) > 430:
-        defin_1 = defin[:430]
-        defin_2 = defin[430:860]
+    if len(defin) > 420:
+        defin_1 = defin[:420]
+        defin_2 = defin[420:840]
     else:
         defin_1 = ''
         defin_2 = ''
