@@ -343,7 +343,7 @@ def old_wea(woeid):
     bot.say('%s: %s, %s, %s, %s' % (location, cover, temp, pressure, wind))
 
 def c_to_f(temp):
-    return temp * 1.8 + 32
+    return round(temp * 1.8 + 32, 2)
 
 def ms_to_mph(speed):
     return speed * 2.23694
