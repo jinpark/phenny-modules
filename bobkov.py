@@ -134,7 +134,7 @@ class Generator:
             word = self._get_next_word(tail)
             sentence.append(word)
         
-        return word_separator.join(sentence[depth-1:][:1-depth])
+        return word_separator.join(sentence[:1-depth])
 
 class Sql:
     WORD_COL_NAME_PREFIX = 'word'
