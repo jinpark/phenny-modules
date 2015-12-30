@@ -206,4 +206,7 @@ def bobkov(bot, trigger):
     db = Db(sqlite3.connect(os.path.join(bot.config.core.homedir, name + '.db')), Sql())
     generator = Generator(name, db, Rnd())
     starting_word = trigger.group(2).split()[0] or '^'
-    bot.say(generator.generate(WORD_SEPARATOR, starting_word))
+    try:
+        bot.say(generator.generate(WORD_SEPARATOR, starting_word))
+    except:
+        bot.say('blargh, you blarghed me')
