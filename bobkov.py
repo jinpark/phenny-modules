@@ -6,19 +6,11 @@ markov.py - bob markov Module
 from sopel.module import commands, example
 import os
 import sys
-try:
-    from markov_text.db import Db
-    from markov_text.gen import Generator
-    from markov_text.parse import Parser
-    from markov_text.sql import Sql
-    from markov_text.rnd import Rnd
-except:
-    sys.path.append(os.path.join(os.path.dirname(__file__), "markov_text"))
-    from markov_text.db import Db
-    from markov_text.gen import Generator
-    from markov_text.parse import Parser
-    from markov_text.sql import Sql
-    from markov_text.rnd import Rnd
+from sopel.modules.markov_text.db import Db
+from sopel.modules.markov_text.gen import Generator
+from sopel.modules.markov_text.parse import Parser
+from sopel.modules.markov_text.sql import Sql
+from sopel.modules.markov_text.rnd import Rnd
 import sqlite3
 import codecs
 
