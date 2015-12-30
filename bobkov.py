@@ -122,9 +122,9 @@ class Generator:
                 return w
         assert False
 
-    def generate(self, word_separator):
+    def generate(self, word_separator, starting_word):
         depth = self.db.get_depth()
-        sentence = [Parser.SENTENCE_START_SYMBOL] * (depth - 1)
+        sentence = [starting_word] * (depth - 1)
         end_symbol = [Parser.SENTENCE_END_SYMBOL] * (depth - 1)
 
         while True:
@@ -198,11 +198,12 @@ class Rnd:
 
 name = 'cbirkett'
 WORD_SEPARATOR = ' '
-db = Db(sqlite3.connect(name + '.db'), Sql())
-generator = Generator(name, db, Rnd())
 
 @commands('bobkov')
 @example('.bobkov')
 def bobkov(bot, trigger):
     """.bobkov - markov chain of bob"""
-    bot.say(generator.generate(WORD_SEPARATOR))
+    db = Db(sqlite3.connect(os.path.join(bot.config.core.homedir, name + '.db')), Sql())
+    generator = Generator(name, db, Rnd())
+    starting_word = trigger.group(2).split()[0] or '^'
+    bot.say(generator.generate(WORD_SEPARATOR, starting_word))
