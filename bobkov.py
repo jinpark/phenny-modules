@@ -217,7 +217,7 @@ def bobkov(bot, trigger):
     except:
         starting_word = '^'
     try:
-        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 5))
+        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 10))
     except Exception as e:
         print(e)
         bot.say('blargh, you blarghed me')
