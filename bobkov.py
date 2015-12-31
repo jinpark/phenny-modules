@@ -149,9 +149,7 @@ class Generator:
                 sentence.append(word)
 
             retry = retry - 1
-            print("retried for {} , retry #{}, sentence is {}".format(starting_word, retry, sentence))
 
-        print("success - word: {} , retry #{}, sentence is {}".format(starting_word, retry, sentence))
         return word_separator.join(sentence[:1-depth])
 
 class Sql:
@@ -228,7 +226,7 @@ def bobkov(bot, trigger):
     except:
         starting_word = '^'
     try:
-        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 10))
+        bot.say("bob sayz: {}".format(generator.generate(WORD_SEPARATOR, starting_word, 10)))
     except Exception as e:
         print(e)
         bot.say('blargh, you blarghed me')
