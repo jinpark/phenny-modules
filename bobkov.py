@@ -139,6 +139,7 @@ class Generator:
             sentence.pop(0)
 
         if len(sentence) < 3 and retry > 0:
+            print("retried for {} , retry #{}, sentence is {}".format(starting_word, retry, sentence))
             self.generate(word_separator, starting_word, retry - 1)
 
         return word_separator.join(sentence[:1-depth])
