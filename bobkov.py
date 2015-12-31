@@ -138,10 +138,19 @@ class Generator:
         if sentence[0] == '^':
             sentence.pop(0)
 
-        if len(sentence) < 3 and retry > 0:
+        while len(sentence) < 3 and retry > 0:
+            sentence = [starting_word] * (depth - 1)
+
+            while True:
+                tail = sentence[(-depth+1):]
+                if tail == end_symbol:
+                    break
+                word = self._get_next_word(tail)
+                sentence.append(word)
+
+            retry = retry - 1
             print("retried for {} , retry #{}, sentence is {}".format(starting_word, retry, sentence))
-            self.generate(word_separator, starting_word, retry - 1)
-            
+
         print("success - word: {} , retry #{}, sentence is {}".format(starting_word, retry, sentence))
         return word_separator.join(sentence[:1-depth])
 
