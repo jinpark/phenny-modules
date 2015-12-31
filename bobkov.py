@@ -216,6 +216,6 @@ def bobkov(bot, trigger):
     except:
         starting_word = '^'
     try:
-        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 3))
+        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 5))
     except:
         bot.say('blargh, you blarghed me')
