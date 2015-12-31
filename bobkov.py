@@ -122,7 +122,7 @@ class Generator:
                 return w
         assert False
 
-    def generate(self, word_separator, starting_word):
+    def generate(self, word_separator, starting_word, retry):
         depth = self.db.get_depth()
         sentence = [starting_word] * (depth - 1)
         end_symbol = [Parser.SENTENCE_END_SYMBOL] * (depth - 1)
@@ -135,7 +135,11 @@ class Generator:
             sentence.append(word)
 
 
-        
+        if sentence[0] == '^':
+            sentence.pop(0)
+
+        if len(sentence) < 2 and retry > 0:
+            generate(self, word_separator, starting_word, retry - 1)
         return word_separator.join(sentence[:1-depth])
 
 class Sql:
@@ -212,6 +216,6 @@ def bobkov(bot, trigger):
     except:
         starting_word = '^'
     try:
-        bot.say(generator.generate(WORD_SEPARATOR, starting_word))
+        bot.say(generator.generate(WORD_SEPARATOR, starting_word, 3))
     except:
         bot.say('blargh, you blarghed me')
