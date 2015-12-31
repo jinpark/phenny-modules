@@ -138,7 +138,7 @@ class Generator:
         if sentence[0] == '^':
             sentence.pop(0)
 
-        if len(sentence) < 2 and retry > 0:
+        if len(sentence) < 3 and retry > 0:
             generate(self, word_separator, starting_word, retry - 1)
         return word_separator.join(sentence[:1-depth])
 
