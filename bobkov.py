@@ -124,7 +124,8 @@ class Generator:
 
     def generate(self, word_separator, starting_word, retry):
         depth = self.db.get_depth()
-        sentence = [starting_word] * (depth - 1)
+        sentence = [Parser.SENTENCE_START_SYMBOL] * (depth - 2)
+        sentence.append(starting_word)
         end_symbol = [Parser.SENTENCE_END_SYMBOL] * (depth - 1)
 
         while True:
@@ -150,7 +151,7 @@ class Generator:
 
             retry = retry - 1
 
-        return word_separator.join(sentence[:1-depth])
+        return word_separator.join(sentence[1:][:1-depth])
 
 class Sql:
     WORD_COL_NAME_PREFIX = 'word'
