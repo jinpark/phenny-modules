@@ -151,7 +151,7 @@ class Generator:
 
             retry = retry - 1
 
-        return word_separator.join(sentence[1:][:1-depth])
+        return word_separator.join(sentence[:1-depth])
 
 class Sql:
     WORD_COL_NAME_PREFIX = 'word'
