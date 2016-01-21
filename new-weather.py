@@ -275,11 +275,20 @@ def update_woeid(bot, trigger):
         name = first_result['place']['name']
         try:
             town = first_result['place']['admin3']['content']
-        except:
+        except TypeError:
             town = ''
-        city = first_result['place']['admin2']['content']
-        state = first_result['place']['admin1']['content']
-        country = first_result['place']['country']['content']
+        try:
+            city = first_result['place']['admin2']['content']
+        except TypeError:
+            city = ''
+        try:
+            state = first_result['place']['admin1']['content']
+        except TypeError:
+            state = ''
+        try:
+            country = first_result['place']['country']['content']
+        except TypeError:
+            country = ''
 
         bot.reply('I now have you at WOEID %s (%s %s, %s, %s, %s.) and at timezone %s' %
                   (woeid, name, town, city, state, country, timezone))
