@@ -272,7 +272,7 @@ def update_woeid(bot, trigger):
         bot.db.set_nick_value(nick, 'location', location)
         bot.db.set_nick_value(nick, 'tz', timezone)
 
-            name = first_result['place']['name']
+        name = first_result['place']['name']
         try:
             town = first_result['place']['admin3']['content']
         except:
