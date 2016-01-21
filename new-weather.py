@@ -272,6 +272,7 @@ def update_woeid(bot, trigger):
         bot.db.set_nick_value(nick, 'location', location)
         bot.db.set_nick_value(nick, 'tz', timezone)
 
+            name = first_result['place']['name']
         try:
             town = first_result['place']['admin3']['content']
         except:
@@ -280,8 +281,8 @@ def update_woeid(bot, trigger):
         state = first_result['place']['admin1']['content']
         country = first_result['place']['country']['content']
 
-        bot.reply('I now have you at WOEID %s (%s %s, %s, %s.) and at timezone %s' %
-                  (woeid, town, city, state, country, timezone))
+        bot.reply('I now have you at WOEID %s (%s %s, %s, %s, %s.) and at timezone %s' %
+                  (woeid, name, town, city, state, country, timezone))
     else:
         bot.reply("I can't remember that; I don't have a database.")
 
