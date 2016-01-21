@@ -52,7 +52,7 @@ def woeid_search(query):
     # body = web.get('http://query.yahooapis.com/v1/public/yql?' + query)
     payload = {'q': 'select * from geo.places(1) where text="%s"' % query, 'format': 'json'}
     body = requests.get('http://query.yahooapis.com/v1/public/yql?', params=payload)
-    parsed = body.json
+    parsed = body.json()
     first_result = parsed['query']['results']
     if first_result is None or len(first_result) == 0:
         return None
