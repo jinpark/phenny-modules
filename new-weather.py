@@ -50,10 +50,10 @@ def woeid_search(query):
     """
     # query = urllib.urlencode({'q': 'select * from geo.placefinder where text="%s"' % query})
     # body = web.get('http://query.yahooapis.com/v1/public/yql?' + query)
-    payload = {'q': 'select * from geo.placefinder where text="%s"' % query}
-    body = requests.get('http://query.yahooapis.com/v1/public/yql?', params=payload).content
-    parsed = etree.fromstring(body)
-    first_result = parsed.find('results/Result')
+    payload = {'q': 'select * from geo.places(1) where text="%s"' % query, 'format': 'json'}
+    body = requests.get('http://query.yahooapis.com/v1/public/yql?', params=payload)
+    parsed = body.json
+    first_result = parsed['query']['results']
     if first_result is None or len(first_result) == 0:
         return None
     return first_result
@@ -182,14 +182,10 @@ def weather(bot, trigger):
         else: 
             first_result = woeid_search(location)
             if first_result is not None:
-                woeid = first_result.find('woeid').text
-                latitude = first_result.find('latitude').text
-                longitude = first_result.find('longitude').text
-                location = first_result.find('line2').text
-                if not location:
-                    location = first_result.find('line1').text
-                if not location:
-                    location = first_result.find('line4').text
+                woeid = first_result['place']['woeid']
+                latitude = first_result['place']['centroid']['latitude']
+                longitude = first_result['place']['centroid']['longitude']
+                location = first_result['place']['name']
 
     if not woeid:
         return bot.reply("I don't know where that is.")
@@ -242,14 +238,10 @@ def weather_forecast(bot, trigger):
         else: 
             first_result = woeid_search(location)
             if first_result is not None:
-                woeid = first_result.find('woeid').text
-                latitude = first_result.find('latitude').text
-                longitude = first_result.find('longitude').text
-                location = first_result.find('line2').text
-                if not location:
-                    location = first_result.find('line1').text
-                if not location:
-                    location = first_result.find('line4').text
+                woeid = first_result['place']['woeid']
+                latitude = first_result['place']['centroid']['latitude']
+                longitude = first_result['place']['centroid']['longitude']
+                location = first_result['place']['name']
                 units = 'si'
 
     if not woeid:
@@ -268,15 +260,11 @@ def update_woeid(bot, trigger):
         if first_result is None:
             return bot.reply("I don't know where that is.")
 
-        woeid = first_result.find('woeid').text
-        latitude = first_result.find('latitude').text
-        longitude = first_result.find('longitude').text
-        location = first_result.find('line2').text
-        if not location:
-            location = first_result.find('line1').text
-        if not location:
-            location = first_result.find('line4').text
-        timezone = get_timezone(bot, latitude, longitude)
+        woeid = first_result['place']['woeid']
+        latitude = first_result['place']['centroid']['latitude']
+        longitude = first_result['place']['centroid']['longitude']
+        location = first_result['place']['name']
+        timezone = first_result['place']['timezone']['content']
 
         bot.db.set_nick_value(nick, 'woeid', woeid)
         bot.db.set_nick_value(nick, 'latitude', latitude)
@@ -284,18 +272,16 @@ def update_woeid(bot, trigger):
         bot.db.set_nick_value(nick, 'location', location)
         bot.db.set_nick_value(nick, 'tz', timezone)
 
-        neighborhood = first_result.find('neighborhood').text or ''
-        if neighborhood:
-            neighborhood += ','
-        city = first_result.find('city').text or ''
-        state = first_result.find('state').text or ''
-        country = first_result.find('country').text or ''
         try:
-            uzip = first_result.find('uzip').text
+            town = first_result['place']['admin3']['content']
         except:
-            uzip = ''
-        bot.reply('I now have you at WOEID %s (%s %s, %s, %s %s.) and at timezone %s' %
-                  (woeid, neighborhood, city, state, country, uzip, timezone))
+            town = ''
+        city = first_result['place']['admin2']['content']
+        state = first_result['place']['admin1']['content']
+        country = first_result['place']['country']['content']
+
+        bot.reply('I now have you at WOEID %s (%s %s, %s, %s.) and at timezone %s' %
+                  (woeid, town, city, state, country, timezone))
     else:
         bot.reply("I can't remember that; I don't have a database.")
 
@@ -349,6 +335,7 @@ def ms_to_mph(speed):
     return speed * 2.23694
 
 def get_timezone(bot, lat, lon):
+    """ Not used anymore. Yahoo API returns it all """
     timezonedb_url = "http://ws.geonames.org/timezoneJSON?lat={}&lng={}&username={}".format(lat, lon, bot.config.apikeys.geonames_username)
     tz_json = requests.get(timezonedb_url).json()
     return tz_json['timezoneId']
