@@ -322,7 +322,7 @@ def wfbase(bot, latitude, longitude, location, units='si'):
         deg = degf
     else:
         deg = degc
-    return '{location} - Today: {min_temp}-{max_temp}{deg} {summary} Tomorrow: {tom_min}-{tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
+    return '{location} - Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min}-{tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
                                                                                                                                                                                                         week_summary=weajson['daily']['summary'])
 
