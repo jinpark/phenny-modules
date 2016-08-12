@@ -310,7 +310,7 @@ def weabase(bot, latitude, longitude, location, units='si'):
         opp_deg = degf
         windspeedunits = "m/s"
         opp_windspeedunits = "mph"
-    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
+    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
 
 def wfbase(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
