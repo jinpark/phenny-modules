@@ -66,7 +66,7 @@ def duck_search(query):
     query = query.replace('!', '')
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
     uri = 'http://duckduckgo.com/html/?q=%s&kl=us-en' % query
-    soup = BeautifulSoup(requests.get(uri, header={'User-Agent': user_agent}).content, "html.parser")
+    soup = BeautifulSoup(requests.get(uri, headers={'User-Agent': user_agent}).content, "html.parser")
     # if 'web-result' in bytes:  # filter out the adds on top of the page
     #     bytes = bytes.split('web-result')[2]
     # m = r_duck.search(bytes)
