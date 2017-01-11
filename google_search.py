@@ -33,6 +33,8 @@ from sopel import web
 from sopel.module import commands, example
 import json
 import sys
+import requests
+from bs4 import BeautifulSoup
 
 if sys.version_info.major < 3:
     from urllib import quote_plus
@@ -50,7 +52,7 @@ def formatnumber(n):
 r_bing = re.compile(r'<h3><a href="([^"]+)"')
 
 
-def bing_search(query, lang='en-GB'):
+def bing_search(query, lang='en-US'):
     base = 'http://www.bing.com/search?mkt=%s&q=' % lang
     bytes = web.get(base + query)
     m = r_bing.search(bytes)
@@ -62,13 +64,16 @@ r_duck = re.compile(r'nofollow" class="[^"]+" href="(?!https?:\/\/r\.search\.yah
 
 def duck_search(query):
     query = query.replace('!', '')
-    uri = 'http://duckduckgo.com/html/?q=%s&kl=uk-en' % query
-    bytes = web.get(uri)
-    if 'web-result' in bytes:  # filter out the adds on top of the page
-        bytes = bytes.split('web-result')[1]
-    m = r_duck.search(bytes)
-    if m:
-        return web.decode(m.group(1))
+    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
+    uri = 'http://duckduckgo.com/html/?q=%s&kl=us-en' % query
+    soup = BeautifulSoup(requests.get(uri, header={'User-Agent': user_agent}).content, "html.parser")
+    # if 'web-result' in bytes:  # filter out the adds on top of the page
+    #     bytes = bytes.split('web-result')[2]
+    # m = r_duck.search(bytes)
+    # if m:
+    #     return web.decode(m.group(1))
+    if soup.select('.result__a'):
+        return soup.select('.result__a')[2]['href']
 
 # Alias google_search to duck_search
 google_search = duck_search
