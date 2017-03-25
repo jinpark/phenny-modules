@@ -5,13 +5,17 @@ aftership.py - Willie aftership tracking module
 import requests
 import json
 
+from sopel.module import commands, example
+
 API_URL = "https://api.aftership.com/v4"
 HEADERS = {"Content-Type": "application/json", "aftership-api-key": bot.config.apikeys.aftership_api_key}
 
+@commands('track')
+@example('.track SOMENUMBER')
 def track(bot, trigger):
     tracking_number = trigger.group(2)
     nick = trigger.nick.lower()
-    
+
     message = ".track TRACKING_NUMBER"
     if tracking_number:
         message = create_tracking(tracking_number, nick)
