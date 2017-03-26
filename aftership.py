@@ -50,5 +50,11 @@ def create_tracking(tracking_number, nick, bot):
 def get_tracking(tracking_id):
     r = requests.get(u"{}/{}/{}".format(API_URL, 'trackings', tracking_id), headers=HEADERS).json()
     tracking_data = r["data"]["tracking"]
-    message = u"{}: Expected: {}, Latest Status: {}: {}".format(tracking_data["tracking_number"], tracking_data["expected_delivery"], tracking_data["checkpoints"][-1]["message"], tracking_data["checkpoints"][-1]["checkpoint_time"] )
+    message = u"{}: Expected: {}, Latest Status: {}: {} in {}".format(
+        tracking_data["tracking_number"], 
+        tracking_data["expected_delivery"], 
+        tracking_data["checkpoints"][-1]["message"], 
+        tracking_data["checkpoints"][-1]["checkpoint_time"],
+        tracking_data["checkpoints"][-1]["city"] 
+    )
     return message
