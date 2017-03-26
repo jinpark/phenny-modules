@@ -4,6 +4,7 @@ aftership.py - Willie aftership tracking module
 """
 import requests
 import json
+import datetime
 
 from sopel.module import commands, example
 
