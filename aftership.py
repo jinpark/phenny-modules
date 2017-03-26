@@ -57,6 +57,6 @@ def get_tracking(tracking_id):
         tracking_data["expected_delivery"], 
         tracking_data["checkpoints"][-1]["message"], 
         checkpoint_datetime.strftime("%m/%d %H:%M"),
-        tracking_data["checkpoints"][-1]["city"] 
+        tracking_data["checkpoints"][-1]["location"] 
     )
     return message
