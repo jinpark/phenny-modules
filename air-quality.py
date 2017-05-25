@@ -111,7 +111,8 @@ def air_quality(bot, trigger):
                 uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
                 bot.db.set_nick_value(nick, 'uid', uid)
             else: 
-                return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
+                uid = search_keyword_uid(bot, location_or_nick)
+                # return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else:
             uid = search_keyword_uid(bot, location_or_nick)
 
