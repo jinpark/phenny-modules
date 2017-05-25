@@ -19,7 +19,6 @@ def search_keyword(bot, location):
 
 def get_feed(bot, uid):
     key = bot.config.apikeys.aqicn_key
-    print(['getfeed', uid])
     r = requests.get(FEED_URL.format(uid, key)).json()
     return r
 
@@ -52,7 +51,6 @@ def aqi_status(aqi):
 
 def construct_airq_string(bot, uid):
     data = get_feed(bot, uid)
-    print(['construct', data])
     if data["status"] == "ok":
         data = data["data"]
         aqi = data["aqi"]
