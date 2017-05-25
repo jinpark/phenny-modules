@@ -32,7 +32,9 @@ def aqicn_uid_lat_lng_search(bot, lat, lng):
 def search_keyword_uid(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(SEARCH_URL.format(key, location)).json()
-    print(['search keyword', search])
+    if len(search["data"]) == 0:
+        bot.say("I don't know where that is")
+        return
     uid = search["data"][0]["station"]["uid"]
     return uid
 
@@ -95,14 +97,14 @@ def air_quality(bot, trigger):
         if bot.db.get_nick_value(location_or_nick, 'uid'):
             nick = location_or_nick
             uid = bot.db.get_nick_value(nick, 'uid')
-            if not uid:
-                latitude = bot.db.get_nick_value(nick, 'latitude')
-                longitude = bot.db.get_nick_value(nick, 'longitude')
-                if latitude:
-                    uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
-                else: 
-                    return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
-        else: 
+        elif bot.db.get_nick_value(nick, 'latitude'): 
+            latitude = bot.db.get_nick_value(nick, 'latitude')
+            longitude = bot.db.get_nick_value(nick, 'longitude')
+            if latitude:
+                uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
+            else: 
+                return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
+        else:
             uid = search_keyword_uid(bot, location_or_nick)
 
     if not uid:
