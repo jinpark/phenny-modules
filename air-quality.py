@@ -7,7 +7,7 @@ import requests
 
 BASE_URL = "http://api.waqi.info/"
 SEARCH_URL = "http://api.waqi.info/search/?token={}&keyword={}"
-FEED_URL = "http://api.waqi.info/feed/{}/?token={}"
+FEED_URL = "http://api.waqi.info/feed/@{}/?token={}"
 LAT_LNG_FEED_URL = "http://api.waqi.info/feed/geo:{};{}/?token={}"
 
 def search_keyword(bot, location):
