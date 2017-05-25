@@ -59,8 +59,14 @@ def construct_airq_string(bot, uid):
         aqi = data["aqi"]
         city = data["city"]["name"]
         dominant_pollution = data["dominentpol"]
-        pm25 = data["iaqi"]["pm25"]["v"]
-        pm10 = data["iaqi"]["pm10"]["v"]
+        try:
+            pm25 = data["iaqi"]["pm25"]["v"]
+        except:
+            pm25 = '?'
+        try: 
+            pm10 = data["iaqi"]["pm10"]["v"]
+        except:
+            pm10 = '?'
         status = aqi_status(aqi)
 
         return "Current Air Quality in {} is {}. AQI is {}. Dominant pollution is {}. pm25: {} pm10: {}" \
