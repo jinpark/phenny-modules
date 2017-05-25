@@ -64,7 +64,7 @@ def aqicn_uid_search(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(AQI_SEARCH_URL.format(key, location)).json()
     if len(search) > 0:
-        uid = search["data"][0]["station"]["uid"]
+        uid = search["data"][0]["uid"]
         name = search["data"][0]["station"]["name"]
         return uid, name
     return None, None
