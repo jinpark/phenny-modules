@@ -20,6 +20,8 @@ degf = "\xb0F"
 bold = "\x02"
 forc = ['f','F','c','C']
 
+AQI_SEARCH_URL = "http://api.waqi.info/search/?token={}&keyword={}"
+
 def degreeToDirection(deg):
   if (337.5 <= deg <= 360) or (0 <= deg < 22.5):
     return "N"
@@ -58,6 +60,12 @@ def woeid_search(query):
         return None
     return first_result
 
+def aqicn_uid_search(bot, location):
+    key = bot.config.apikeys.aqicn_key
+    search = requests.get(AQI_SEARCH_URL.format(key, location)).json()
+    uid = search["data"][0]["station"]["uid"]
+    name = search["data"][0]["station"]["name"]
+    return uid, name
 
 def get_cover(parsed):
     try:
@@ -290,8 +298,12 @@ def update_woeid(bot, trigger):
         except TypeError:
             country = ''
 
-        bot.reply('I now have you at WOEID %s (%s %s, %s, %s, %s.) and at timezone %s' %
-                  (woeid, name, town, city, state, country, timezone))
+        uid, station_name = aqicn_uid_search(bot, trigger.group(2))
+        bot.db.set_nick_value(nick, 'uid', uid)
+
+        bot.reply('I now have you at WOEID %s (%s %s, %s, %s, %s.), timezone %s and at uid %s-%s' %
+                  (woeid, name, town, city, state, country, timezone, uid, station_name))
+
     else:
         bot.reply("I can't remember that; I don't have a database.")
 
