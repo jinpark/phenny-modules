@@ -34,7 +34,7 @@ def search_keyword_uid(bot, location):
     search = requests.get(SEARCH_URL.format(key, location)).json()
     if len(search["data"]) == 0:
         return
-    uid = search["data"][0]["station"]["uid"]
+    uid = search["data"][0]["uid"]
     return uid
 
 def aqi_status(aqi):
