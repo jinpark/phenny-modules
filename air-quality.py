@@ -26,7 +26,7 @@ def aqicn_uid_lat_lng_search(bot, lat, lng):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(LAT_LNG_FEED_URL.format(lat, lng, key)).json()
     # if search["status"] == 'OK'
-    uid = search["data"][0]["station"]["uid"]
+    uid = search["data"]["station"]["uid"]
     return uid
 
 def search_keyword_uid(bot, location):
