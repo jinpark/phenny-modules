@@ -8,16 +8,16 @@ import requests
 BASE_URL = "http://api.waqi.info/"
 SEARCH_URL = "http://api.waqi.info/search/?token={}&keyword={}"
 FEED_URL = "http://api.waqi.info/feed/{}/?token={}"
-LAT_LNG_FEED_URL "http://api.waqi.info/feed/geo:{};{}/?token={}"
+LAT_LNG_FEED_URL = "http://api.waqi.info/feed/geo:{};{}/?token={}"
 
-def search_keyword(bot, location)
+def search_keyword(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(SEARCH_URL.format(key, location)).json()
     uid = search["data"][0]["station"]["uid"]
     feed = requests.get(FEED_URL.format(uid)).json()
     return feed["data"]
 
-def get_feed(bot, uid)
+def get_feed(bot, uid):
     key = bot.config.apikeys.aqicn_key
     r = requests.get(FEED_URL.format(uid, key)).json()
     return r
@@ -29,7 +29,7 @@ def aqicn_uid_lat_lng_search(bot, lat, lng):
     uid = search["data"][0]["station"]["uid"]
     return uid
 
-def search_keyword_uid(not, location)
+def search_keyword_uid(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(SEARCH_URL.format(key, location)).json()
     uid = search["data"][0]["station"]["uid"]
