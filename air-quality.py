@@ -51,6 +51,7 @@ def aqi_status(aqi):
 
 def construct_airq_string(bot, uid):
     data = get_feed(bot, uid)
+    print(['construct', data])
     if data["status"] == "ok":
         data = data["data"]
         aqi = data["aqi"]
