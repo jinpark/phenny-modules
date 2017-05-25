@@ -98,10 +98,12 @@ def air_quality(bot, trigger):
             nick = location_or_nick
             uid = bot.db.get_nick_value(nick, 'uid')
         elif bot.db.get_nick_value(nick, 'latitude'): 
+            nick = location_or_nick
             latitude = bot.db.get_nick_value(nick, 'latitude')
             longitude = bot.db.get_nick_value(nick, 'longitude')
             if latitude:
                 uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
+                bot.db.set_nick_value(nick, 'uid', uid)
             else: 
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else:
