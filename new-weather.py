@@ -63,9 +63,11 @@ def woeid_search(query):
 def aqicn_uid_search(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(AQI_SEARCH_URL.format(key, location)).json()
-    uid = search["data"][0]["station"]["uid"]
-    name = search["data"][0]["station"]["name"]
-    return uid, name
+    if len(data) > 0:
+        uid = search["data"][0]["station"]["uid"]
+        name = search["data"][0]["station"]["name"]
+        return uid, name
+    return None, None
 
 def get_cover(parsed):
     try:
@@ -299,7 +301,11 @@ def update_woeid(bot, trigger):
             country = ''
 
         uid, station_name = aqicn_uid_search(bot, trigger.group(2))
-        bot.db.set_nick_value(nick, 'uid', uid)
+        if uid:
+            bot.db.set_nick_value(nick, 'uid', uid)
+        else:
+            uid = '?'
+            station_name = '?'
 
         bot.reply('I now have you at WOEID %s (%s %s, %s, %s, %s.), timezone %s and at uid %s-%s' %
                   (woeid, name, town, city, state, country, timezone, uid, station_name))

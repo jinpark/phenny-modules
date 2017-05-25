@@ -33,7 +33,6 @@ def search_keyword_uid(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(SEARCH_URL.format(key, location)).json()
     if len(search["data"]) == 0:
-        bot.say("I don't know where that is")
         return
     uid = search["data"][0]["station"]["uid"]
     return uid
