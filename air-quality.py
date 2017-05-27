@@ -38,18 +38,20 @@ def search_keyword_uid(bot, location):
     return uid
 
 def aqi_status(aqi):
-    if aqi < 50:
-        return "Good"
-    elif 50 <= aqi < 100:
-        return "Moderate"
-    elif 100 <= aqi < 150:
-        return "Unhealthy for Sensitive Groups"
-    elif 150 <= aqi < 200:
-        return "Unhealthy"
-    elif 250 <= aqi < 300:
-        return "Very Unhealthy"
-    elif aqi > 300:
-        return "Hazardous"
+    if aqi:
+        if aqi < 50:
+            return "Good"
+        elif 50 <= aqi < 100:
+            return "Moderate"
+        elif 100 <= aqi < 150:
+            return "Unhealthy for Sensitive Groups"
+        elif 150 <= aqi < 200:
+            return "Unhealthy"
+        elif 250 <= aqi < 300:
+            return "Very Unhealthy"
+        elif aqi > 300:
+            return "Hazardous"
+    return 'Unknown'
 
 def construct_airq_string(bot, uid):
     data = get_feed(bot, uid)
