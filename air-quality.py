@@ -29,7 +29,7 @@ def airvisual_lag_lng(bot, lat, lng):
     if search["status"] == "success":
         aqi = search["data"]["current"]["pollution"]["aqius"]
         city = search["data"]["city"]
-        city = search["data"]["state"]
+        state = search["data"]["state"]
         return aqi, city, state
     return None, None, None
 
