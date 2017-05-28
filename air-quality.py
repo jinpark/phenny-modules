@@ -54,7 +54,7 @@ def aqicn_uid_lat_lng_search(bot, lat, lng):
 def search_keyword_uid(bot, location):
     key = bot.config.apikeys.aqicn_key
     search = requests.get(SEARCH_URL.format(key, location)).json()
-    if len(search["data"]) == 0:
+    if len(search["data"]) == 0 or search["data"][0]["aqi"] != "-":
         return
     uid = search["data"][0]["uid"]
     return uid
@@ -91,7 +91,6 @@ def construct_airq_string(bot, uid):
         except:
             pm10 = '?'
         status = aqi_status(aqi)
-
         return "Current Air Quality in {} is {}. AQI is {}. Dominant pollution is {}. pm25: {} pm10: {}" \
                 .format(city, status, aqi, dominant_pollution, pm25, pm10)
     return "stupid bob"
