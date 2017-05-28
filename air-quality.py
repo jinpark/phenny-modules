@@ -28,7 +28,7 @@ def airvisual_lag_lng(bot, lat, lng):
     search = requests.get(AIRVISUAL_LAT_LNG.format(key, lat, lng)).json()
     if search["status"] == "success":
         aqi = search["data"]["current"]["pollution"]["aqius"]
-        city = aqi = search["data"]["city"]
+        city = search["data"]["city"]
         return aqi, city
     return None, None
 
@@ -149,7 +149,10 @@ def air_quality(bot, trigger):
             aqi, city = airvisual_lag_lng(bot, lat, lng)
             if aqi: 
                 airquality_text = construct_short_airq_string(aqi, city)
-        return bot.reply("I don't know where that is.")
+            else:
+                return bot.reply("I don't know where that is.")
+        else:
+            return bot.reply("I don't know where that is.")
 
     if not airquality_text:
         airquality_text = construct_airq_string(bot, uid)
