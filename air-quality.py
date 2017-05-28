@@ -38,7 +38,7 @@ def search_keyword_uid(bot, location):
     return uid
 
 def aqi_status(aqi):
-    if aqi:
+    if aqi and isinstance( aqi, int ):
         if aqi < 50:
             return "Good"
         elif 50 <= aqi < 100:
