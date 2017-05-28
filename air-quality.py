@@ -9,6 +9,28 @@ BASE_URL = "http://api.waqi.info/"
 SEARCH_URL = "http://api.waqi.info/search/?token={}&keyword={}"
 FEED_URL = "http://api.waqi.info/feed/@{}/?token={}"
 LAT_LNG_FEED_URL = "http://api.waqi.info/feed/geo:{};{}/?token={}"
+GEOCODE_URL = "http://www.mapquestapi.com/geocoding/v1/address?key={}&location={}"
+AIRVISUAL_LAT_LNG = "http://api.airvisual.com/v2/nearest_city?key={}&lat={}&lon={}"
+
+def geocode(location):
+    key = bot.config.apikeys.mapquest_key
+    search = requests.get(GEOCODE_URL.format(key, location)).json()
+    status = search["info"]["statuscode"]
+    if status != 0 and len(results["locations"]) > 0:
+        found_location = results["locations"][0]
+        lat = results["locations"][0]["latLng"]["lat"] 
+        lng = results["locations"][0]["latLng"]["lng"]
+        return lat, lng
+    return None, None
+
+def airvisual_lag_lng(lat, lng):
+    key = bot.config.apikeys.airvisual_key
+    search = requests.get(AIRVISUAL_LAT_LNG.format(key, lat, lng)).json()
+    if search["status"] == "success":
+        aqi = search["data"]["current"]["pollution"]["aqius"]
+        city = aqi = search["data"]["city"]
+        return aqi, city
+    return None, None
 
 def search_keyword(bot, location):
     key = bot.config.apikeys.aqicn_key
@@ -74,12 +96,17 @@ def construct_airq_string(bot, uid):
                 .format(city, status, aqi, dominant_pollution, pm25, pm10)
     return "stupid bob"
 
+def construct_short_airq_string(aqi, city):
+    status = aqi_status(aqi)
+    return "Current Air Quality in {} is {}. AQI is {}." \
+            .format(city, status, aqi)
+
 @commands('air', 'aq', 'airq')
 @example('.air seoul')
 def air_quality(bot, trigger):
     """.air location - Show the air quality at the given location."""
     # If no input, check current user. If input, check if input is a user or search location instead
-
+    airquality_text = ''
     location_or_nick = trigger.group(2)
     try:
         location_or_nick = trigger.group(2).lower()
@@ -118,7 +145,13 @@ def air_quality(bot, trigger):
             uid = search_keyword_uid(bot, location_or_nick)
 
     if not uid:
+        lat, lng = geocode(location_or_nick)
+        if lat:
+            aqi, city = airvisual_lag_lng(lat, lng)
+            if aqi: 
+                airquality_text = construct_short_airq_string(aqi, city)
         return bot.reply("I don't know where that is.")
 
-    airquality_text = construct_airq_string(bot, uid)
+    if not airquality_text:
+        airquality_text = construct_airq_string(bot, uid)
     bot.say(airquality_text)
