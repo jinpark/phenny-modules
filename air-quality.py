@@ -12,7 +12,7 @@ LAT_LNG_FEED_URL = "http://api.waqi.info/feed/geo:{};{}/?token={}"
 GEOCODE_URL = "http://www.mapquestapi.com/geocoding/v1/address?key={}&location={}"
 AIRVISUAL_LAT_LNG = "http://api.airvisual.com/v2/nearest_city?key={}&lat={}&lon={}"
 
-def geocode(location):
+def geocode(bot, location):
     key = bot.config.apikeys.mapquest_key
     search = requests.get(GEOCODE_URL.format(key, location)).json()
     status = search["info"]["statuscode"]
@@ -23,7 +23,7 @@ def geocode(location):
         return lat, lng
     return None, None
 
-def airvisual_lag_lng(lat, lng):
+def airvisual_lag_lng(bot, lat, lng):
     key = bot.config.apikeys.airvisual_key
     search = requests.get(AIRVISUAL_LAT_LNG.format(key, lat, lng)).json()
     if search["status"] == "success":
@@ -145,9 +145,9 @@ def air_quality(bot, trigger):
             uid = search_keyword_uid(bot, location_or_nick)
 
     if not uid:
-        lat, lng = geocode(location_or_nick)
+        lat, lng = geocode(bot, location_or_nick)
         if lat:
-            aqi, city = airvisual_lag_lng(lat, lng)
+            aqi, city = airvisual_lag_lng(bot, lat, lng)
             if aqi: 
                 airquality_text = construct_short_airq_string(aqi, city)
         return bot.reply("I don't know where that is.")
