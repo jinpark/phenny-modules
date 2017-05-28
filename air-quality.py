@@ -16,10 +16,10 @@ def geocode(bot, location):
     key = bot.config.apikeys.mapquest_key
     search = requests.get(GEOCODE_URL.format(key, location)).json()
     status = search["info"]["statuscode"]
-    if status != 0 and len(results["locations"]) > 0:
-        found_location = results["locations"][0]
-        lat = results["locations"][0]["latLng"]["lat"] 
-        lng = results["locations"][0]["latLng"]["lng"]
+    if status == 0 and len(search["results"]) > 0 and len(search["results"][0]["locations"]) > 0:
+        found_location = search["results"][0]["locations"][0]
+        lat = search["results"][0]["locations"][0]["latLng"]["lat"] 
+        lng = search["results"][0]["locations"][0]["latLng"]["lng"]
         return lat, lng
     return None, None
 
