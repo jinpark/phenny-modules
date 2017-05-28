@@ -29,8 +29,9 @@ def airvisual_lag_lng(bot, lat, lng):
     if search["status"] == "success":
         aqi = search["data"]["current"]["pollution"]["aqius"]
         city = search["data"]["city"]
-        return aqi, city
-    return None, None
+        city = search["data"]["state"]
+        return aqi, city, state
+    return None, None, None
 
 def search_keyword(bot, location):
     key = bot.config.apikeys.aqicn_key
@@ -95,10 +96,10 @@ def construct_airq_string(bot, uid):
                 .format(city, status, aqi, dominant_pollution, pm25, pm10)
     return "stupid bob"
 
-def construct_short_airq_string(aqi, city):
+def construct_short_airq_string(aqi, city, state):
     status = aqi_status(aqi)
-    return "Current Air Quality in {} is {}. AQI is {}." \
-            .format(city, status, aqi)
+    return "Current Air Quality in {}, {} is {}. AQI is {}." \
+            .format(city, state, status, aqi)
 
 @commands('air', 'aq', 'airq')
 @example('.air seoul')
@@ -146,9 +147,9 @@ def air_quality(bot, trigger):
     if not uid:
         lat, lng = geocode(bot, location_or_nick)
         if lat:
-            aqi, city = airvisual_lag_lng(bot, lat, lng)
+            aqi, city, state = airvisual_lag_lng(bot, lat, lng)
             if aqi: 
-                airquality_text = construct_short_airq_string(aqi, city)
+                airquality_text = construct_short_airq_string(aqi, city, state)
             else:
                 return bot.reply("I don't know where that is.")
         else:
