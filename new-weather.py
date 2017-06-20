@@ -404,26 +404,31 @@ def w5base(bot, latitude, longitude, location, units='si'):
         deg = degf
     else:
         deg = degc
-    return """{location} - Tomorrow: {min_temp} to {max_temp}{deg} 
-              {two_days}: {two_days_min} to {two_days_max}{deg} 
-              {three_days}: {three_days_min} to {three_days_max}{deg} 
-              {four_days}: {four_days_min} to {four_days_max}{deg} 
-              {five_days}: {five_days_min} to {five_days_max}{deg}""" \
-              .format(location=location, 
+    return """{location} - Tomorrow: {min_temp} to {max_temp}{deg} {summary}, 
+{two_days}: {two_days_min} to {two_days_max}{deg} {two_days_summary}, 
+{three_days}: {three_days_min} to {three_days_max}{deg} {three_days_summary}, 
+{four_days}: {four_days_min} to {four_days_max}{deg} {four_days_summary}, 
+{five_days}: {five_days_min} to {five_days_max}{deg} {five_days_summary}""" \
+              .format(location=location, deg=deg, 
                       min_temp=str(int(round(wea_forecast[1]["temperatureMin"]))), 
-                      max_temp=str(int(round(wea_forecast[1]["temperatureMax"]))), deg=deg, 
+                      max_temp=str(int(round(wea_forecast[1]["temperatureMax"]))), 
+                      summary=wea_forecast[1]["summary"], 
                       two_days=timestamp_to_date(wea_forecast[2]['time']), 
                       two_days_min=str(int(round(wea_forecast[2]["temperatureMin"]))), 
                       two_days_max=str(int(round(wea_forecast[2]["temperatureMax"]))), 
+                      two_days_summary=wea_forecast[2]["summary"], 
                       three_days=timestamp_to_date(wea_forecast[3]['time']), 
                       three_days_min=str(int(round(wea_forecast[3]["temperatureMin"]))), 
-                      three_days_max=str(int(round(wea_forecast[3]["temperatureMax"]))), 
+                      three_days_max=str(int(round(wea_forecast[3]["temperatureMax"]))),
+                      three_days_summary=wea_forecast[3]["summary"],  
                       four_days=timestamp_to_date(wea_forecast[4]['time']),
                       four_days_min=str(int(round(wea_forecast[4]["temperatureMin"]))), 
-                      four_days_max=str(int(round(wea_forecast[4]["temperatureMax"]))), 
+                      four_days_max=str(int(round(wea_forecast[4]["temperatureMax"]))),
+                      four_days_summary=wea_forecast[4]["summary"],  
                       five_days=timestamp_to_date(wea_forecast[5]['time']), 
                       five_days_min=str(int(round(wea_forecast[5]["temperatureMin"]))), 
-                      five_days_max=str(int(round(wea_forecast[5]["temperatureMax"])))
+                      five_days_max=str(int(round(wea_forecast[5]["temperatureMax"]))),
+                      five_days_summary=wea_forecast[5]["summary"], 
                       )
            
 
