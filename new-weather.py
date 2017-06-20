@@ -11,6 +11,7 @@ http://willie.dftba.net
 from sopel import web
 from sopel.module import commands, example
 
+from datetime import datetime
 import feedparser
 from lxml import etree
 import requests
@@ -39,6 +40,9 @@ def degreeToDirection(deg):
     return "W"
   elif 292.5 <= deg < 337.5:
     return "NW"
+
+def timestamp_to_date(timestamp):
+    return datetime.fromtimestamp(timestamp).strftime('%m/%d')
 
 
 def setup(bot):
@@ -260,6 +264,53 @@ def weather_forecast(bot, trigger):
     wf_text = wfbase(bot, latitude, longitude, location, units)
     bot.say(wf_text)
 
+
+@commands('w5', 'wd')
+@example('.w5 London')
+def weather_five_days(bot, trigger):
+    """.w5 location - Show the weather forecast at the given location for the next 4 days."""
+
+    location = trigger.group(2)
+    try:
+        location = trigger.group(2).lower()
+    except:
+        location = ''
+    woeid = ''
+    units = 'si'
+    nick = trigger.nick.lower()
+    if not location:
+        woeid = bot.db.get_nick_value(nick, 'woeid')
+        latitude = bot.db.get_nick_value(nick, 'latitude')
+        longitude = bot.db.get_nick_value(nick, 'longitude')
+        location = bot.db.get_nick_value(nick, 'location')
+        if not woeid:
+            return bot.msg(trigger.sender, "I don't know where you live. " +
+                           'Give me a location, like .weather London, or tell me where you live by saying .setlocation London, for example.')
+    else:
+        location = location.strip()
+        if bot.db.get_nick_value(location, 'woeid'):
+            nick = location
+            woeid = bot.db.get_nick_value(nick, 'woeid')
+            latitude = bot.db.get_nick_value(nick, 'latitude')
+            longitude = bot.db.get_nick_value(nick, 'longitude')
+            location = bot.db.get_nick_value(nick, 'location')
+            if not woeid:
+                return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
+        else: 
+            first_result = woeid_search(location)
+            if first_result is not None:
+                woeid = first_result['place']['woeid']
+                latitude = first_result['place']['centroid']['latitude']
+                longitude = first_result['place']['centroid']['longitude']
+                location = first_result['place']['name']
+                units = 'si'
+
+    if not woeid:
+        return bot.reply("I don't know where that is.")
+
+    w5_text = w5base(bot, latitude, longitude, location, units)
+    bot.say(w5_text)
+
 @commands('setlocation', 'setloc')
 @example('.setlocation Columbus, OH')
 def update_woeid(bot, trigger):
@@ -343,6 +394,38 @@ def wfbase(bot, latitude, longitude, location, units='si'):
     return '{location} - Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
                                                                                                                                                                                                         week_summary=weajson['daily']['summary'])
+
+def w5base(bot, latitude, longitude, location, units='si'):
+    forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
+    weajson = requests.get(forecast_url).json()
+    wea_forecast = weajson['daily']['data']
+    units = weajson['flags']['units']
+    if units == 'us':
+        deg = degf
+    else:
+        deg = degc
+    return """{location} - Tomorrow: {min_temp} to {max_temp}{deg} 
+              {two_days}: {two_days_min} to {two_days_max}{deg} 
+              {three_days}: {three_days_min} to {three_days_max}{deg} 
+              {four_days}: {four_days_min} to {four_days_max}{deg} 
+              {five_days}: {five_days_min} to {five_days_max}{deg}""" \
+              .format(location=location, 
+                      min_temp=str(int(round(wea_forecast[1]["temperatureMin"]))), 
+                      max_temp=str(int(round(wea_forecast[1]["temperatureMax"]))), deg=deg, 
+                      two_days=timestamp_to_date(wea_forecast[2]['time']), 
+                      two_days_min=str(int(round(wea_forecast[2]["temperatureMin"]))), 
+                      two_days_max=str(int(round(wea_forecast[2]["temperatureMax"]))), 
+                      three_days=timestamp_to_date(wea_forecast[3]['time']), 
+                      three_days_min=str(int(round(wea_forecast[3]["temperatureMin"]))), 
+                      three_days_max=str(int(round(wea_forecast[3]["temperatureMax"]))), 
+                      four_days=timestamp_to_date(wea_forecast[4]['time']),
+                      four_days_min=str(int(round(wea_forecast[4]["temperatureMin"]))), 
+                      four_days_max=str(int(round(wea_forecast[4]["temperatureMax"]))), 
+                      five_days=timestamp_to_date(wea_forecast[5]['time']), 
+                      five_days_min=str(int(round(wea_forecast[5]["temperatureMin"]))), 
+                      five_days_max=str(int(round(wea_forecast[5]["temperatureMax"])))
+                      )
+           
 
 def old_wea(woeid):
     query = web.urlencode({'w': woeid, 'u': 'c'})
