@@ -1,2 +1,3 @@
 *.db
 markov.py
+*.pyc
