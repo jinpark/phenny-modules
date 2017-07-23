@@ -250,6 +250,52 @@ def weather_forecast(bot, trigger):
     wf_text = wfbase(bot, latitude, longitude, location, units)
     bot.say(wf_text)
 
+@commands('wc')
+@example('.wc London')
+def weather_combined(bot, trigger):
+    """.wc location - Show the weather and forecast at the given location."""
+
+    location = trigger.group(2)
+    try:
+        location = trigger.group(2).lower()
+    except:
+        location = ''
+    woeid = ''
+    units = 'si'
+    nick = trigger.nick.lower()
+    if not location:
+        woeid = bot.db.get_nick_value(nick, 'woeid')
+        latitude = bot.db.get_nick_value(nick, 'latitude')
+        longitude = bot.db.get_nick_value(nick, 'longitude')
+        location = bot.db.get_nick_value(nick, 'location')
+        if not woeid:
+            return bot.msg(trigger.sender, "I don't know where you live. " +
+                           'Give me a location, like .weather London, or tell me where you live by saying .setlocation London, for example.')
+    else:
+        location = location.strip()
+        if bot.db.get_nick_value(location, 'woeid'):
+            nick = location
+            woeid = bot.db.get_nick_value(nick, 'woeid')
+            latitude = bot.db.get_nick_value(nick, 'latitude')
+            longitude = bot.db.get_nick_value(nick, 'longitude')
+            location = bot.db.get_nick_value(nick, 'location')
+            if not woeid:
+                return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
+        else: 
+            first_result = woeid_search(location)
+            if first_result is not None:
+                woeid = first_result['place']['woeid']
+                latitude = first_result['place']['centroid']['latitude']
+                longitude = first_result['place']['centroid']['longitude']
+                location = first_result['place']['name']
+                units = 'si'
+
+    if not woeid:
+        return bot.reply("I don't know where that is.")
+
+    wc_text = wcbase(bot, latitude, longitude, location, units)
+    bot.say(wc_text)
+
 @commands('setlocation', 'setloc')
 @example('.setlocation Columbus, OH')
 def update_woeid(bot, trigger):
@@ -325,6 +371,32 @@ def wfbase(bot, latitude, longitude, location, units='si'):
     return '{location} - Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
                                                                                                                                                                                                         week_summary=weajson['daily']['summary'])
+
+
+def wcbase(bot, latitude, longitude, location, units='si'):
+    forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
+    json_forecast = requests.get(forecast_url).json()
+    nowwea = json_forecast['currently']
+    currentwea = weajson['daily']['data'][0]
+    tomwea = weajson['daily']['data'][1]
+    units = json_forecast['flags']['units']
+    if units == 'us':
+        deg = degf
+        opp_deg = defc
+        windspeedunits = "mph"
+        opp_windspeedunits = "m/s"
+    else:
+        deg = degc
+        opp_deg = degf
+        windspeedunits = "m/s"
+        opp_windspeedunits = "mph"
+    wea_text = "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
+    wf_text = ' | Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
+                                                                                                                                                                                                        tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
+                                                                                                                                                                                                        week_summary=weajson['daily']['summary'])
+    return wea_text + wf_text
+
+
 
 def old_wea(woeid):
     query = web.urlencode({'w': woeid, 'u': 'c'})
