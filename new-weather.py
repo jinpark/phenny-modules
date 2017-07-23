@@ -440,6 +440,65 @@ def wfbase(bot, latitude, longitude, location, units='si'):
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
                                                                                                                                                                                                         week_summary=weajson['daily']['summary'])
 
+def w5base(bot, latitude, longitude, location, units='si'):
+    forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
+    weajson = requests.get(forecast_url).json()
+    wea_forecast = weajson['daily']['data']
+    units = weajson['flags']['units']
+    if units == 'us':
+        deg = degf
+    else:
+        deg = degc
+    return """{location} - Tomorrow: {min_temp} to {max_temp}{deg} {summary}, 
+{two_days}: {two_days_min} to {two_days_max}{deg} {two_days_summary}, 
+{three_days}: {three_days_min} to {three_days_max}{deg} {three_days_summary}, 
+{four_days}: {four_days_min} to {four_days_max}{deg} {four_days_summary}, 
+{five_days}: {five_days_min} to {five_days_max}{deg} {five_days_summary}""" \
+              .format(location=location, deg=deg, 
+                      min_temp=str(int(round(wea_forecast[1]["temperatureMin"]))), 
+                      max_temp=str(int(round(wea_forecast[1]["temperatureMax"]))), 
+                      summary=wea_forecast[1]["summary"], 
+                      two_days=timestamp_to_date(wea_forecast[2]['time']), 
+                      two_days_min=str(int(round(wea_forecast[2]["temperatureMin"]))), 
+                      two_days_max=str(int(round(wea_forecast[2]["temperatureMax"]))), 
+                      two_days_summary=wea_forecast[2]["summary"], 
+                      three_days=timestamp_to_date(wea_forecast[3]['time']), 
+                      three_days_min=str(int(round(wea_forecast[3]["temperatureMin"]))), 
+                      three_days_max=str(int(round(wea_forecast[3]["temperatureMax"]))),
+                      three_days_summary=wea_forecast[3]["summary"],  
+                      four_days=timestamp_to_date(wea_forecast[4]['time']),
+                      four_days_min=str(int(round(wea_forecast[4]["temperatureMin"]))), 
+                      four_days_max=str(int(round(wea_forecast[4]["temperatureMax"]))),
+                      four_days_summary=wea_forecast[4]["summary"],  
+                      five_days=timestamp_to_date(wea_forecast[5]['time']), 
+                      five_days_min=str(int(round(wea_forecast[5]["temperatureMin"]))), 
+                      five_days_max=str(int(round(wea_forecast[5]["temperatureMax"]))),
+                      five_days_summary=wea_forecast[5]["summary"], 
+                      )
+
+def wcbase(bot, latitude, longitude, location, units='si'):
+    forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
+    json_forecast = requests.get(forecast_url).json()
+    nowwea = json_forecast['currently']
+    currentwea = weajson['daily']['data'][0]
+    tomwea = weajson['daily']['data'][1]
+    units = json_forecast['flags']['units']
+    if units == 'us':
+        deg = degf
+        opp_deg = defc
+        windspeedunits = "mph"
+        opp_windspeedunits = "m/s"
+    else:
+        deg = degc
+        opp_deg = degf
+        windspeedunits = "m/s"
+        opp_windspeedunits = "mph"
+    wea_text = "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
+    wf_text = ' | Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
+                                                                                                                                                                                                        tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
+                                                                                                                                                                                                        week_summary=weajson['daily']['summary'])
+    return wea_text + wf_text
+
 def old_wea(woeid):
     query = web.urlencode({'w': woeid, 'u': 'c'})
     url = 'http://weather.yahooapis.com/forecastrss?' + query
