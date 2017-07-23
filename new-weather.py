@@ -479,9 +479,10 @@ def w5base(bot, latitude, longitude, location, units='si'):
 def wcbase(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
     json_forecast = requests.get(forecast_url).json()
+    
     nowwea = json_forecast['currently']
-    currentwea = weajson['daily']['data'][0]
-    tomwea = weajson['daily']['data'][1]
+    currentwea = json_forecast['daily']['data'][0]
+    tomwea = json_forecast['daily']['data'][1]
     units = json_forecast['flags']['units']
     if units == 'us':
         deg = degf
@@ -496,7 +497,7 @@ def wcbase(bot, latitude, longitude, location, units='si'):
     wea_text = "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
     wf_text = ' | Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
-                                                                                                                                                                                                        week_summary=weajson['daily']['summary'])
+                                                                                                                                                                                                        week_summary=json_forecast['daily']['summary'])
     return wea_text + wf_text
 
 def old_wea(woeid):
