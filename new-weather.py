@@ -7,6 +7,7 @@ Licensed under the Eiffel Forum License 2.
 
 http://willie.dftba.net
 """
+# NOTE: delete wea, and wf code later
 
 from sopel import web
 from sopel.module import commands, example
@@ -164,8 +165,8 @@ def get_wind(parsed):
     return description + ' ' + str(speed) + 'kt (' + degrees + ')'
 
 
-@commands('weather', 'wea')
-@example('.weather London')
+# @commands('weather', 'wea')
+# @example('.weather London')
 def weather(bot, trigger):
     """.weather location - Show the weather at the given location."""
     location = trigger.group(2)
@@ -218,8 +219,8 @@ def weather(bot, trigger):
     # bot.say(u'%s: %s, %s, %s, %s' % (location, cover, temp, pressure, wind))
 
 
-@commands('wf', 'forecast')
-@example('.wf London')
+# @commands('wf', 'forecast')
+# @example('.wf London')
 def weather_forecast(bot, trigger):
     """.weather location - Show the weather at the given location."""
 
@@ -264,7 +265,7 @@ def weather_forecast(bot, trigger):
     wf_text = wfbase(bot, latitude, longitude, location, units)
     bot.say(wf_text)
 
-@commands('wc')
+@commands('wc', 'wf', 'forecast', 'weather', 'wea')
 @example('.wc London')
 def weather_combined(bot, trigger):
     """.wc location - Show the weather and forecast at the given location."""
