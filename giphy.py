@@ -14,7 +14,7 @@ import random
 def giphy(bot, trigger):
     """.giphy cat"""
     API_KEY = bot.config.apikeys.giphy
-    user_input = urlib.quote_plus(trigger.group(2))
+    user_input = urllib.quote_plus(trigger.group(2))
     payload = {'api_key': API_KEY, 'q': user_input, 'offset': 0, 'limit': 5, 'rating': 'PG-13'}
     r = requests.get("http://api.giphy.com/v1/gifs/search", params=payload)
     giphy_json = r.json()
