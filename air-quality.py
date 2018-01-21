@@ -82,7 +82,10 @@ def construct_airq_string(bot, uid):
         data = data["data"]
         aqi = data["aqi"]
         city = data["city"]["name"]
-        dominant_pollution = data["dominentpol"]
+        try: 
+            dominant_pollution = data["dominentpol"]
+        except:
+            dominant_pollution = '?'
         try:
             pm25 = data["iaqi"]["pm25"]["v"]
         except:
