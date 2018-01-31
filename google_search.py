@@ -41,9 +41,6 @@ if sys.version_info.major < 3:
 else:
     from urllib.parse import quote_plus
 
-GOOGLE_API_KEY = bot.config.apikeys.google
-GOOGLE_SEARCH_ENGINE_KEY = bot.config.apikeys.google_search
-
 def formatnumber(n):
     """Format a number with beautiful commas."""
     parts = list(str(n))
@@ -161,7 +158,8 @@ def suggest(bot, trigger):
 @commands('g', 'search')
 def google_search(bot, trigger):
     query = quote_plus(trigger.group(2))
-
+    GOOGLE_API_KEY = bot.config.apikeys.google
+    GOOGLE_SEARCH_ENGINE_KEY = bot.config.apikeys.google_search
     r = requests.get(u"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={search_engine_key}&q={query}".format(
         api_key=GOOGLE_API_KEY,
         search_engine_key=GOOGLE_SEARCH_ENGINE_KEY,
