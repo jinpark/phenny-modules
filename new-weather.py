@@ -16,6 +16,7 @@ from datetime import datetime
 import feedparser
 from lxml import etree
 import requests
+import pytz
 
 degc = "\xb0C"
 degf = "\xb0F"
@@ -103,6 +104,12 @@ def get_pressure(parsed):
     millibar = float(pressure)
     inches = int(millibar / 33.7685)
     return ('%din (%dmb)' % (inches, int(millibar)))
+
+
+def convert_unixtime_to_local(unixtime, timezone):
+    tz = pytz.timezone(timezone)
+    localtime = datetime.fromtimestamp(sr, pytz.utc).astimezone(tz)
+    return localtime.strftime("%H:%M:%S")
 
 
 def get_wind(parsed):
@@ -414,6 +421,8 @@ def weabase(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
     json_forecast = requests.get(forecast_url).json()
     nowwea = json_forecast['currently']
+    today = json_forecast['daily']['data'][0]
+    timezone = json_forecast['timezone']
     units = json_forecast['flags']['units']
     if units == 'us':
         deg = degf
@@ -425,7 +434,7 @@ def weabase(bot, latitude, longitude, location, units='si'):
         opp_deg = degf
         windspeedunits = "m/s"
         opp_windspeedunits = "mph"
-    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({})".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)) )
+    return "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({}) Sunrise: {} Sunset {}".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)), str(convert_unixtime_to_local(today['sunriseTime'], timezone)), str(convert_unixtime_to_local(today['sunsetTime'], timezone)) )
 
 def wfbase(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
