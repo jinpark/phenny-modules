@@ -41,7 +41,6 @@ if sys.version_info.major < 3:
 else:
     from urllib.parse import quote_plus
 
-
 def formatnumber(n):
     """Format a number with beautiful commas."""
     parts = list(str(n))
@@ -96,7 +95,7 @@ def duck_api(query):
         return None
 
 
-@commands('duck', 'ddg', 'g')
+@commands('duck', 'ddg')
 @example('.duck privacy or .duck !mcwiki obsidian')
 def duck(bot, trigger):
     """Queries Duck Duck Go for the specified input."""
@@ -121,8 +120,8 @@ def duck(bot, trigger):
         bot.reply("No results found for '%s'." % query)
 
 
-@commands('search')
-@example('.search nerdfighter')
+@commands('searchb')
+@example('.searchb nerdfighter')
 def search(bot, trigger):
     """Searches Bing and Duck Duck Go."""
     if not trigger.group(2):
@@ -155,3 +154,21 @@ def suggest(bot, trigger):
         bot.say(answer)
     else:
         bot.reply('Sorry, no result.')
+
+@commands('g', 'search')
+def google_search(bot, trigger):
+    query = quote_plus(trigger.group(2))
+    GOOGLE_API_KEY = bot.config.apikeys.google
+    GOOGLE_SEARCH_ENGINE_KEY = bot.config.apikeys.google_search
+    r = requests.get(u"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={search_engine_key}&q={query}".format(
+        api_key=GOOGLE_API_KEY,
+        search_engine_key=GOOGLE_SEARCH_ENGINE_KEY,
+        query=query
+    ))
+    results = r.json()
+    if results["searchInformation"]["totalResults"] != "0":
+        first_result = results["items"][0]
+        bot.say(u"{link} - {title}".format(link=first_result["link"], title=first_result["title"]))
+        return
+    else:
+        bot.say("Sorry, no result. Blame bob.")
