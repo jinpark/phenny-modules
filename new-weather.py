@@ -454,6 +454,8 @@ def w5base(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
     weajson = requests.get(forecast_url).json()
     wea_forecast = weajson['daily']['data']
+    today = weajson['daily']['data'][0]
+    timezone = weajson['timezone']
     units = weajson['flags']['units']
     if units == 'us':
         deg = degf
