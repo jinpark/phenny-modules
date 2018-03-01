@@ -454,8 +454,6 @@ def w5base(bot, latitude, longitude, location, units='si'):
     forecast_url = 'https://api.forecast.io/forecast/' + bot.config.apikeys.darksky_key + '/' + str(latitude) + ',' + str(longitude) + '?units=' + units
     weajson = requests.get(forecast_url).json()
     wea_forecast = weajson['daily']['data']
-    today = weajson['daily']['data'][0]
-    timezone = weajson['timezone']
     units = weajson['flags']['units']
     if units == 'us':
         deg = degf
@@ -495,6 +493,7 @@ def wcbase(bot, latitude, longitude, location, units='si'):
     nowwea = json_forecast['currently']
     currentwea = json_forecast['daily']['data'][0]
     tomwea = json_forecast['daily']['data'][1]
+    timezone = json_forecast['timezone']
     units = json_forecast['flags']['units']
     if units == 'us':
         deg = degf
@@ -506,7 +505,7 @@ def wcbase(bot, latitude, longitude, location, units='si'):
         opp_deg = degf
         windspeedunits = "m/s"
         opp_windspeedunits = "mph"
-    wea_text = "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({}) Sunrise: {} Sunset {}".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)), convert_unixtime_to_local(today['sunriseTime'], timezone), convert_unixtime_to_local(today['sunsetTime'], timezone) )
+    wea_text = "{}: {}{} ({}{}) {}. Wind {} {} {} ({} {}). Humidity: {}. Feels like {} ({}) Sunrise: {} Sunset {}".format(location, str(int(nowwea["temperature"])), deg, str(c_to_f(int(nowwea["temperature"]))), opp_deg, nowwea["summary"], degreeToDirection(nowwea["windBearing"]), str(round(nowwea["windSpeed"],1)), windspeedunits, str(round(ms_to_mph(nowwea["windSpeed"]),1)), opp_windspeedunits, str(nowwea["humidity"]), str(round(nowwea["apparentTemperature"],1)), str(round(c_to_f(nowwea["apparentTemperature"]),1)), convert_unixtime_to_local(currentwea['sunriseTime'], timezone), convert_unixtime_to_local(currentwea['sunsetTime'], timezone) )
 
     wf_text = 'Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
