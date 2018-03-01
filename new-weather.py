@@ -510,7 +510,7 @@ def wcbase(bot, latitude, longitude, location, units='si'):
     wf_text = 'Today: {min_temp} to {max_temp}{deg} {summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(location=location, min_temp=str(int(round(currentwea["temperatureMin"]))), max_temp=str(int(round(currentwea["temperatureMax"]))), deg=deg, summary=currentwea["summary"],
                                                                                                                                                                                                         tom_min=str(int(round(tomwea["temperatureMin"]))), tom_max=str(int(round(tomwea["temperatureMax"]))), tom_summary=tomwea["summary"],
                                                                                                                                                                                                         week_summary=json_forecast['daily']['summary'])
-    return wea_text + wf_text
+    return wea_text + " " + wf_text
 
 def old_wea(woeid):
     query = web.urlencode({'w': woeid, 'u': 'c'})
