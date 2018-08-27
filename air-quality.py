@@ -18,7 +18,7 @@ def geocode(bot, location):
     status = search["info"]["statuscode"]
     if status == 0 and len(search["results"]) > 0 and len(search["results"][0]["locations"]) > 0:
         found_location = search["results"][0]["locations"][0]
-        lat = search["results"][0]["locations"][0]["latLng"]["lat"] 
+        lat = search["results"][0]["locations"][0]["latLng"]["lat"]
         lng = search["results"][0]["locations"][0]["latLng"]["lng"]
         return lat, lng
     return None, None
@@ -76,13 +76,14 @@ def aqi_status(aqi):
             return "Hazardous"
     return 'Unknown'
 
-def construct_airq_string(bot, uid):
+def construct_airq_string(bot, uid, second=False):
+    print('second time ', second)
     data = get_feed(bot, uid)
     if data["status"] == "ok":
         data = data["data"]
         aqi = data["aqi"]
         city = data["city"]["name"]
-        try: 
+        try:
             dominant_pollution = data["dominentpol"]
         except:
             dominant_pollution = '?'
@@ -90,13 +91,15 @@ def construct_airq_string(bot, uid):
             pm25 = data["iaqi"]["pm25"]["v"]
         except:
             pm25 = '?'
-        try: 
+        try:
             pm10 = data["iaqi"]["pm10"]["v"]
         except:
             pm10 = '?'
         status = aqi_status(aqi)
         return "Current Air Quality in {} is {}. AQI is {}. Dominant pollution is {}. pm25: {} pm10: {}" \
                 .format(city, status, aqi, dominant_pollution, pm25, pm10)
+    if second == False:
+        construct_airq_string(bot, uid, True)
     return "stupid bob"
 
 def construct_short_airq_string(aqi, city, state):
@@ -126,7 +129,7 @@ def air_quality(bot, trigger):
             longitude = bot.db.get_nick_value(nick, 'longitude')
             if latitude:
                 uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
-            else: 
+            else:
                 return bot.msg(trigger.sender, "I don't know where you live. " +
                            'Give me a location, like .air London, or tell me where you live by saying .setlocation London, for example.')
     else:
@@ -134,14 +137,14 @@ def air_quality(bot, trigger):
         if bot.db.get_nick_value(location_or_nick, 'uid'):
             nick = location_or_nick
             uid = bot.db.get_nick_value(nick, 'uid')
-        elif bot.db.get_nick_value(nick, 'latitude'): 
+        elif bot.db.get_nick_value(nick, 'latitude'):
             nick = location_or_nick
             latitude = bot.db.get_nick_value(nick, 'latitude')
             longitude = bot.db.get_nick_value(nick, 'longitude')
             if latitude:
                 uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
                 bot.db.set_nick_value(nick, 'uid', uid)
-            else: 
+            else:
                 uid = search_keyword_uid(bot, location_or_nick)
                 # return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else:
@@ -151,7 +154,7 @@ def air_quality(bot, trigger):
         lat, lng = geocode(bot, location_or_nick)
         if lat:
             aqi, city, state = airvisual_lag_lng(bot, lat, lng)
-            if aqi: 
+            if aqi:
                 airquality_text = construct_short_airq_string(aqi, city, state)
             else:
                 return bot.reply("I don't know where that is.")
