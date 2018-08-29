@@ -164,8 +164,8 @@ def air_quality(bot, trigger):
             else:
                 # uid = search_keyword_uid(bot, location_or_nick)
                 # return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
-        else:
-            uid = search_keyword_uid(bot, location_or_nick)
+        # else:
+        #     uid = search_keyword_uid(bot, location_or_nick)
 
     if not uid and not airquality_text:
         lat, lng = geocode(bot, location_or_nick)
