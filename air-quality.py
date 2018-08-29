@@ -136,7 +136,7 @@ def air_quality(bot, trigger):
     if not location_or_nick:
         # looking for self
         # uid = bot.db.get_nick_value(nick, 'uid')
-        uid =
+        uid = None
         if not uid:
             latitude = bot.db.get_nick_value(nick, 'latitude')
             longitude = bot.db.get_nick_value(nick, 'longitude')
