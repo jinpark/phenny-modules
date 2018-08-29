@@ -4,6 +4,7 @@ from sopel import web
 from sopel.module import commands, example
 
 import requests
+import datetime
 
 BASE_URL = "http://api.waqi.info/"
 SEARCH_URL = "http://api.waqi.info/search/?token={}&keyword={}"
@@ -30,8 +31,9 @@ def airvisual_lag_lng(bot, lat, lng):
         aqi = search["data"]["current"]["pollution"]["aqius"]
         city = search["data"]["city"]
         state = search["data"]["state"]
-        return aqi, city, state
-    return None, None, None
+        updated_time = search["data"]["current"]["pollution"]["ts"]
+        return aqi, city, state, updated_time
+    return None, None, None, None
 
 def search_keyword(bot, location):
     key = bot.config.apikeys.aqicn_key
@@ -77,7 +79,7 @@ def aqi_status(aqi):
     return 'Unknown'
 
 def construct_airq_string(bot, uid, second=False):
-    print('second time ', second)
+    print('second time ', second, datetime.datetime.now())
     data = get_feed(bot, uid)
     if data["status"] == "ok":
         data = data["data"]
@@ -102,6 +104,16 @@ def construct_airq_string(bot, uid, second=False):
         construct_airq_string(bot, uid, True)
     return "stupid bob"
 
+def construct_latlng_airq_string(bot, lat, lng):
+    # print('second time ', second, datetime.datetime.now())
+    aqi, city, state, update_time = airvisual_lag_lng(bot, lat, lng)
+    if aqi:
+        status = aqi_status(aqi)
+        updated_datetime = datetime.datetime.strptime(update_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return "Current Air Quality in {} {} is {}. AQI is {}. Updated at {} UTC" \
+                .format(city, state, status, aqi, updated_datetime.strftime("%m-%d %H:%M"))
+    return "stupid bob. airv aqi failed for some reason"
+
 def construct_short_airq_string(aqi, city, state):
     status = aqi_status(aqi)
     return "Current Air Quality in {}, {} is {}. AQI is {}." \
@@ -123,7 +135,8 @@ def air_quality(bot, trigger):
 
     if not location_or_nick:
         # looking for self
-        uid = bot.db.get_nick_value(nick, 'uid')
+        # uid = bot.db.get_nick_value(nick, 'uid')
+        uid =
         if not uid:
             latitude = bot.db.get_nick_value(nick, 'latitude')
             longitude = bot.db.get_nick_value(nick, 'longitude')
@@ -133,24 +146,28 @@ def air_quality(bot, trigger):
                 return bot.msg(trigger.sender, "I don't know where you live. " +
                            'Give me a location, like .air London, or tell me where you live by saying .setlocation London, for example.')
     else:
+        #     # remove uid temporarily until i figure this out
         location_or_nick = location_or_nick.strip()
-        if bot.db.get_nick_value(location_or_nick, 'uid'):
-            nick = location_or_nick
-            uid = bot.db.get_nick_value(nick, 'uid')
-        elif bot.db.get_nick_value(nick, 'latitude'):
+        # if bot.db.get_nick_value(location_or_nick, 'uid'):
+        #     nick = location_or_nick
+            # uid = bot.db.get_nick_value(nick, 'uid')
+        # elif bot.db.get_nick_value(nick, 'latitude'):
+        if bot.db.get_nick_value(nick, 'latitude'):
             nick = location_or_nick
             latitude = bot.db.get_nick_value(nick, 'latitude')
             longitude = bot.db.get_nick_value(nick, 'longitude')
             if latitude:
-                uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
-                bot.db.set_nick_value(nick, 'uid', uid)
+                # uid = aqicn_uid_lat_lng_search(bot, latitude, longitude)
+                # bot.db.set_nick_value(nick, 'uid', uid)
+                # aqi, city, state = airvisual_lag_lng(bot, lat, lng)
+                airquality_text = construct_latlng_airq_string(bot, latitude, longitude)
             else:
-                uid = search_keyword_uid(bot, location_or_nick)
+                # uid = search_keyword_uid(bot, location_or_nick)
                 # return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else:
             uid = search_keyword_uid(bot, location_or_nick)
 
-    if not uid:
+    if not uid and not airquality_text:
         lat, lng = geocode(bot, location_or_nick)
         if lat:
             aqi, city, state = airvisual_lag_lng(bot, lat, lng)
