@@ -119,8 +119,8 @@ def construct_short_airq_string(aqi, city, state):
     return "Current Air Quality in {}, {} is {}. AQI is {}." \
             .format(city, state, status, aqi)
 
-@commands('air', 'aq', 'airq')
-@example('.air seoul')
+# @commands('air', 'aq', 'airq')
+# @example('.air seoul')
 def air_quality(bot, trigger):
     """.air location - Show the air quality at the given location."""
     # If no input, check current user. If input, check if input is a user or search location instead
@@ -180,4 +180,49 @@ def air_quality(bot, trigger):
 
     if not airquality_text:
         airquality_text = construct_airq_string(bot, uid)
+    bot.say(airquality_text)
+
+@commands('air', 'aq', 'airq')
+@example('.air seoul')
+def air_quality_test(bot, trigger):
+    """.air location - Show the air quality at the given location."""
+    # If no input, check current user. If input, check if input is a user or search location instead
+    airquality_text = ''
+    location_or_nick = trigger.group(2)
+    try:
+        location_or_nick = trigger.group(2).lower().strip()
+    except:
+        location_or_nick = ''
+
+    nick = trigger.nick.lower()
+
+    if not location_or_nick:
+        latitude = bot.db.get_nick_value(nick, 'latitude')
+        longitude = bot.db.get_nick_value(nick, 'longitude')
+        airquality_text = construct_latlng_airq_string(bot, latitude, longitude)
+        if not latitude:
+            return bot.msg(trigger.sender, "I don't know where you live. " +
+                        'Give me a location, like .air London, or tell me where you live by saying .setlocation London, for example.')
+    else:
+        if bot.db.get_nick_value(nick, 'latitude'):
+            nick = location_or_nick
+            latitude = bot.db.get_nick_value(nick, 'latitude')
+            longitude = bot.db.get_nick_value(nick, 'longitude')
+            if latitude:
+                airquality_text = construct_latlng_airq_string(bot, latitude, longitude)
+            else:
+                # uid = search_keyword_uid(bot, location_or_nick)
+                # return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
+        # else:
+        #     uid = search_keyword_uid(bot, location_or_nick)
+
+    if not airquality_text:
+        lat, lng = geocode(bot, location_or_nick)
+        if lat:
+            airquality_text = construct_latlng_airq_string(bot, latitude, longitude)
+            else:
+                return bot.reply("I don't know where that is.")
+        else:
+            return bot.reply("I don't know where that is.")
+
     bot.say(airquality_text)
