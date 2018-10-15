@@ -1,3 +1,4 @@
+
 # -*- coding: utf8 -*-
 """
 jisho.py - Willie giphy Module
@@ -18,11 +19,14 @@ def jisho(bot, trigger):
     jisho_data = r.json()
     if len(jisho_data['data']) > 0:
         data = jisho_data['data'][0]
-        response_string = "Japanese Word: {j_word}, japanese reading {j_reading}. English Definition 1. {e_def}, 2. {e_def2}".format(
-            j_word=data["japanese"][0]["word"], 
-            j_reading=data["japanese"][0]["reading"], 
-            e_def=data["senses"][0]["english_definitions"][0], 
-            e_def2=data["senses"][1]["english_definitions"][0] 
+        response_string = u""
+        if "word" in data["japanese"][0]:
+            response_string += (u"Japanese Word: {j_word}, ".format(data["japanese"][0]["word"]))
+        
+        
+        response_string += u"japanese reading {j_reading}. English Definition 1. {e_def}".format(
+            j_reading=data["japanese"][0]["reading"],
+            e_def=data["senses"][0]["english_definitions"][0]
         )
         bot.say(response_string)
     else:
