@@ -21,13 +21,19 @@ def jisho(bot, trigger):
         data = jisho_data['data'][0]
         response_string = u""
         if "word" in data["japanese"][0]:
-            response_string += (u"Japanese Word: {j_word}, ".format(data["japanese"][0]["word"]))
-        
-        
-        response_string += u"japanese reading {j_reading}. English Definition 1. {e_def}".format(
-            j_reading=data["japanese"][0]["reading"],
-            e_def=data["senses"][0]["english_definitions"][0]
+            response_string += (u"Japanese Word: {j_word}. ".format(
+                j_word=data["japanese"][0]["word"])
         )
+        
+        if "reading" in data["japanese"][0]:
+            response_string += u"Japanese reading {j_reading}. ".format(
+                j_reading=data["japanese"][0]["reading"]
+        )
+        if "english_definitions" in data["senses"][0]:
+            response_string += u"English Definition - {e_def} ".format(
+                e_def=data["senses"][0]["english_definitions"][0]
+        )
+        
         bot.say(response_string)
     else:
         bot.say('No jisho data found. Blame bob')
