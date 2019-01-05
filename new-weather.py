@@ -428,7 +428,7 @@ def update_woeid(bot, trigger):
         except TypeError:
             city = ''
         try:
-            state = result['state'
+            state = result['state']
         except TypeError:
             state = ''
         try:
