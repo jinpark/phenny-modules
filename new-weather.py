@@ -67,7 +67,7 @@ def woeid_search(query):
         return None
     return first_result
 
-def geocoder_search(location_name):
+def geocoder_search(bot, location_name):
     geocoded = geocoder.bing(location_name, key=bot.config.apikeys.bing_maps_key)
     return geocoded.json
 
@@ -208,7 +208,7 @@ def weather(bot, trigger):
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
             # first_result = woeid_search(location)
-            result = geocoder_search(location)
+            result = geocoder_search(bot, location)
             if result["status"] is 'OK':
                 woeid = result['address']
                 latitude = result['lat']
@@ -270,7 +270,7 @@ def weather_forecast(bot, trigger):
             #     latitude = first_result['place']['centroid']['latitude']
             #     longitude = first_result['place']['centroid']['longitude']
             #     location = first_result['place']['name']
-            result = geocoder_search(location)
+            result = geocoder_search(bot, location)
             if result["status"] is 'OK':
                 woeid = result['address']
                 latitude = result['lat']
@@ -322,7 +322,7 @@ def weather_combined(bot, trigger):
             #     latitude = first_result['place']['centroid']['latitude']
             #     longitude = first_result['place']['centroid']['longitude']
             #     location = first_result['place']['name']
-            result = geocoder_search(location)
+            result = geocoder_search(bot, location)
             if result["status"] is 'OK':
                 woeid = result['address']
                 latitude = result['lat']
@@ -374,7 +374,7 @@ def weather_five_days(bot, trigger):
             #     latitude = first_result['place']['centroid']['latitude']
             #     longitude = first_result['place']['centroid']['longitude']
             #     location = first_result['place']['name']
-            result = geocoder_search(location)
+            result = geocoder_search(bot, location)
             if result["status"] is 'OK':
                 woeid = result['address']
                 latitude = result['lat']
@@ -403,7 +403,7 @@ def update_woeid(bot, trigger):
         # longitude = first_result['place']['centroid']['longitude']
         # location = first_result['place']['name']
         # timezone = first_result['place']['timezone']['content']
-        result = geocoder_search(location)
+        result = geocoder_search(bot, location)
         if result["status"] is 'OK':
             woeid = result['address']
             latitude = result['lat']
