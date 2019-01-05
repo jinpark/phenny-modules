@@ -17,6 +17,7 @@ import feedparser
 from lxml import etree
 import requests
 import pytz
+import geocoder
 
 degc = "\xb0C"
 degf = "\xb0F"
@@ -65,6 +66,10 @@ def woeid_search(query):
     if first_result is None or len(first_result) == 0:
         return None
     return first_result
+
+def geocoder_search(location_name):
+    geocoded = geocoder.bing(location_name, key=bot.config.apikeys.bing_maps_key)
+    return geocoded.json
 
 def aqicn_uid_search(bot, location):
     key = bot.config.apikeys.aqicn_key
@@ -202,12 +207,13 @@ def weather(bot, trigger):
             if not woeid:
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
-            first_result = woeid_search(location)
-            if first_result is not None:
-                woeid = first_result['place']['woeid']
-                latitude = first_result['place']['centroid']['latitude']
-                longitude = first_result['place']['centroid']['longitude']
-                location = first_result['place']['name']
+            # first_result = woeid_search(location)
+            result = geocoder_search(location)
+            if result["status"] is 'OK':
+                woeid = result['address']
+                latitude = result['lat']
+                longitude = result['lng']
+                location = result['address']
 
     if not woeid:
         return bot.reply("I don't know where that is.")
@@ -258,12 +264,18 @@ def weather_forecast(bot, trigger):
             if not woeid:
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
-            first_result = woeid_search(location)
-            if first_result is not None:
-                woeid = first_result['place']['woeid']
-                latitude = first_result['place']['centroid']['latitude']
-                longitude = first_result['place']['centroid']['longitude']
-                location = first_result['place']['name']
+            # first_result = woeid_search(location)
+            # if first_result is not None:
+            #     woeid = first_result['place']['woeid']
+            #     latitude = first_result['place']['centroid']['latitude']
+            #     longitude = first_result['place']['centroid']['longitude']
+            #     location = first_result['place']['name']
+            result = geocoder_search(location)
+            if result["status"] is 'OK':
+                woeid = result['address']
+                latitude = result['lat']
+                longitude = result['lng']
+                location = result['address']
                 units = 'si'
 
     if not woeid:
@@ -304,12 +316,18 @@ def weather_combined(bot, trigger):
             if not woeid:
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
-            first_result = woeid_search(location)
-            if first_result is not None:
-                woeid = first_result['place']['woeid']
-                latitude = first_result['place']['centroid']['latitude']
-                longitude = first_result['place']['centroid']['longitude']
-                location = first_result['place']['name']
+            # first_result = woeid_search(location)
+            # if first_result is not None:
+            #     woeid = first_result['place']['woeid']
+            #     latitude = first_result['place']['centroid']['latitude']
+            #     longitude = first_result['place']['centroid']['longitude']
+            #     location = first_result['place']['name']
+            result = geocoder_search(location)
+            if result["status"] is 'OK':
+                woeid = result['address']
+                latitude = result['lat']
+                longitude = result['lng']
+                location = result['address']
                 units = 'si'
 
     if not woeid:
@@ -350,12 +368,18 @@ def weather_five_days(bot, trigger):
             if not woeid:
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
-            first_result = woeid_search(location)
-            if first_result is not None:
-                woeid = first_result['place']['woeid']
-                latitude = first_result['place']['centroid']['latitude']
-                longitude = first_result['place']['centroid']['longitude']
-                location = first_result['place']['name']
+            # first_result = woeid_search(location)
+            # if first_result is not None:
+            #     woeid = first_result['place']['woeid']
+            #     latitude = first_result['place']['centroid']['latitude']
+            #     longitude = first_result['place']['centroid']['longitude']
+            #     location = first_result['place']['name']
+            result = geocoder_search(location)
+            if result["status"] is 'OK':
+                woeid = result['address']
+                latitude = result['lat']
+                longitude = result['lng']
+                location = result['address']
                 units = 'si'
 
     if not woeid:
@@ -370,15 +394,23 @@ def update_woeid(bot, trigger):
     """Set your default weather location."""
     if bot.db:
         nick = trigger.nick.lower()
-        first_result = woeid_search(trigger.group(2))
-        if first_result is None:
-            return bot.reply("I don't know where that is.")
+        # first_result = woeid_search(trigger.group(2))
+        # if first_result is None:
+        #     return bot.reply("I don't know where that is.")
 
-        woeid = first_result['place']['woeid']
-        latitude = first_result['place']['centroid']['latitude']
-        longitude = first_result['place']['centroid']['longitude']
-        location = first_result['place']['name']
-        timezone = first_result['place']['timezone']['content']
+        # woeid = first_result['place']['woeid']
+        # latitude = first_result['place']['centroid']['latitude']
+        # longitude = first_result['place']['centroid']['longitude']
+        # location = first_result['place']['name']
+        # timezone = first_result['place']['timezone']['content']
+        result = geocoder_search(location)
+        if result["status"] is 'OK':
+            woeid = result['address']
+            latitude = result['lat']
+            longitude = result['lng']
+            location = result['address']
+            units = 'si'
+        timezone = get_timezone(bot, latitude, longitude)
 
         bot.db.set_nick_value(nick, 'woeid', woeid)
         bot.db.set_nick_value(nick, 'latitude', latitude)
@@ -386,21 +418,21 @@ def update_woeid(bot, trigger):
         bot.db.set_nick_value(nick, 'location', location)
         bot.db.set_nick_value(nick, 'tz', timezone)
 
-        name = first_result['place']['name']
+        name = result['address']
         try:
-            town = first_result['place']['admin3']['content']
+            town = ''
         except TypeError:
             town = ''
         try:
-            city = first_result['place']['admin2']['content']
+            city = result['city']
         except TypeError:
             city = ''
         try:
-            state = first_result['place']['admin1']['content']
+            state = result['state'
         except TypeError:
             state = ''
         try:
-            country = first_result['place']['country']['content']
+            country = result['country']
         except TypeError:
             country = ''
 
@@ -493,7 +525,7 @@ def wcbase(bot, latitude, longitude, location, units='si'):
     nowwea = json_forecast['currently']
     currentwea = json_forecast['daily']['data'][0]
     tomwea = json_forecast['daily']['data'][1]
-    timezone = json_forecast['timezone']
+    timezone = get_timezone(bot, latitude, longitude)
     units = json_forecast['flags']['units']
     if units == 'us':
         deg = degf
@@ -532,7 +564,7 @@ def ms_to_mph(speed):
 
 def get_timezone(bot, lat, lon):
     """ Not used anymore. Yahoo API returns it all """
-    timezonedb_url = "http://ws.geonames.org/timezoneJSON?lat={}&lng={}&username={}".format(lat, lon, bot.config.apikeys.geonames_username)
+    timezonedb_url = "http://api.geonames.org/timezoneJSON?lat={}&lng={}&username={}".format(lat, lon, bot.config.apikeys.geonames_username)
     tz_json = requests.get(timezonedb_url).json()
     return tz_json['timezoneId']
 
