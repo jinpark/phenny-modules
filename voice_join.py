@@ -17,6 +17,6 @@ def give_voice(bot, trigger, username):
 def voice_join(bot, trigger):
     if  trigger.nick == bot.nick:
         return
-    timer = Threading.timer(30.0, give_voice, args=[bot, trigger, trigger.nick])
+    timer = threading.timer(30.0, give_voice, args=[bot, trigger, trigger.nick])
     
     
