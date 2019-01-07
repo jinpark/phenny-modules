@@ -15,7 +15,7 @@ def give_voice(bot, trigger, username):
 @event('JOIN')
 @rule(r'.*')
 def voice_join(bot, trigger):
-    if  trigger.nick == bot.nick or trigger.isop or trigger.isvoice:
+    if  trigger.nick == bot.nick or trigger.isvoice:
         return
     timer = Threading.timer(30.0, give_voice, args=[bot, trigger, trigger.nick])
     
