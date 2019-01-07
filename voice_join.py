@@ -7,7 +7,7 @@ voide_join.py - Willie giphy Module
 from sopel.module import commands, rule, event
 import threading
 
-def give_voice(bot, trigger, username);
+def give_voice(bot, trigger, username):
     channel = trigger.sender
     print(['give voice ran with', channel, username])
     return bot.write(['MODE', channel, '+v',username])
