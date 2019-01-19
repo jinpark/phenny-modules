@@ -394,7 +394,7 @@ def update_woeid(bot, trigger):
     """Set your default weather location."""
     if bot.db:
         nick = trigger.nick.lower()
-        # first_result = woeid_search(trigger.group(2))
+        location = trigger.group(2)
         # if first_result is None:
         #     return bot.reply("I don't know where that is.")
 
@@ -410,8 +410,9 @@ def update_woeid(bot, trigger):
             longitude = result['lng']
             location = result['address']
             units = 'si'
-        timezone = get_timezone(bot, latitude, longitude)
-
+            timezone = get_timezone(bot, latitude, longitude)
+        else:
+            bot.write('API might be down, Blame bob')
         bot.db.set_nick_value(nick, 'woeid', woeid)
         bot.db.set_nick_value(nick, 'latitude', latitude)
         bot.db.set_nick_value(nick, 'longitude', longitude)
