@@ -420,21 +420,18 @@ def update_woeid(bot, trigger):
         bot.db.set_nick_value(nick, 'tz', timezone)
 
         name = result['address']
-        try:
-            town = ''
-        except TypeError:
-            town = ''
+        town = ''
         try:
             city = result['city']
-        except TypeError:
+        except:
             city = ''
         try:
             state = result['state']
-        except TypeError:
+        except:
             state = ''
         try:
             country = result['country']
-        except TypeError:
+        except:
             country = ''
 
         uid, station_name = aqicn_uid_search(bot, trigger.group(2))
