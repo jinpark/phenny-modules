@@ -9,7 +9,6 @@ import threading
 
 def give_voice(bot, trigger, username):
     channel = trigger.sender
-    print(['give voice ran with', channel, username])
     return bot.write(['MODE', channel, '+v',username])
 
 @event('JOIN')
@@ -18,5 +17,6 @@ def voice_join(bot, trigger):
     if  trigger.nick == bot.nick:
         return
     timer = threading.Timer(30.0, give_voice, args=[bot, trigger, trigger.nick])
+    timer.start()
     
     
