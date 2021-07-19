@@ -284,8 +284,8 @@ def weather_forecast(bot, trigger):
     wf_text = wfbase(bot, latitude, longitude, location, units)
     bot.say(wf_text)
 
-@commands('wc', 'wf', 'forecast', 'weather', 'wea')
-@example('.wc London')
+# @commands('wc', 'wf', 'forecast', 'weather', 'wea')
+# @example('.wc London')
 def weather_combined(bot, trigger):
     """.wc location - Show the weather and forecast at the given location."""
 
@@ -336,8 +336,8 @@ def weather_combined(bot, trigger):
     wc_text = wcbase(bot, latitude, longitude, location, units)
     bot.say(wc_text)
 
-@commands('w5', 'wd')
-@example('.w5 London')
+# @commands('w5', 'wd')
+# @example('.w5 London')
 def weather_five_days(bot, trigger):
     """.w5 location - Show the weather forecast at the given location for the next 4 days."""
 
@@ -388,8 +388,8 @@ def weather_five_days(bot, trigger):
     w5_text = w5base(bot, latitude, longitude, location, units)
     bot.say(w5_text)
 
-@commands('setlocation', 'setloc')
-@example('.setlocation Columbus, OH')
+# @commands('setlocation', 'setloc')
+# @example('.setlocation Columbus, OH')
 def update_woeid(bot, trigger):
     """Set your default weather location."""
     if bot.db:
