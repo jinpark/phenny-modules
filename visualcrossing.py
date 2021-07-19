@@ -13,6 +13,7 @@ from lxml import etree
 import requests
 import pytz
 import geocoder
+import itertools
 
 degc = "\xb0C"
 degf = "\xb0F"
@@ -229,7 +230,7 @@ def weather_five_days(bot, trigger):
     if not woeid:
         return bot.reply("I don't know where that is.")
 
-    w5_text = w5base(bot, latitude, longitude)
+    w5_text = w5base(bot, latitude, longitude, location)
     bot.say(w5_text)
 
 @commands('setlocation', 'setloc')
@@ -283,11 +284,10 @@ def update_woeid(bot, trigger):
     else:
         bot.reply("I can't remember that; I don't have a database.")
 
-def w5base(bot, latitude, longitude):
-    forecast_url = VISUALCROSSING_URL.format("{},{}".format(latitude, longitude), bot.config.apikeys.weatherstack_key, 'metric')
+def w5base(bot, latitude, longitude, location):
+    forecast_url = VISUALCROSSING_URL.format("{},{}".format(latitude, longitude), bot.config.apikeys.visualcrossing_key, 'metric')
     forecast_json = requests.get(forecast_url).json()
-    five_day_forecast = forecast_json['daily'][1:6]
-    location = forecast_json['address']
+    five_day_forecast = forecast_json['days'][1:6]
     format_list = [
         (
             timestamp_to_date(d['datetimeEpoch']),
@@ -296,22 +296,25 @@ def w5base(bot, latitude, longitude):
             d['description']
         ) for d in five_day_forecast
     ]
+    format_list = list(itertools.chain(*format_list))
     format_list[0] = "Tomorrow"
+    print(format_list)
     return """{location} - {0}: {1} to {2}{deg} {3}, 
-                {4}: {5} to {6}{deg} {7}, 
-                {8}: {9} to {10}{deg} {11}, 
-                {12}: {13} to {14}{deg} {15}, 
-                {16}: {17} to {18}{deg} {19}""" \
+{4}: {5} to {6}{deg} {7}, 
+{8}: {9} to {10}{deg} {11}, 
+{12}: {13} to {14}{deg} {15}, 
+{16}: {17} to {18}{deg} {19}""" \
               .format(*format_list, location=location, deg=degc)
 
 def wcbase(bot, latitude, longitude, location):
-    forecast_url = VISUALCROSSING_URL.format("{},{}".format(latitude, longitude), bot.config.apikeys.weatherstack_key, 'metric')
+    forecast_url = VISUALCROSSING_URL.format("{},{}".format(latitude, longitude), bot.config.apikeys.visualcrossing_key, 'metric')
+    json_forecast = requests.get(forecast_url)
+    print(forecast_url)
     json_forecast = requests.get(forecast_url).json()
 
-    location = json_forecast['address']
     current_weather = json_forecast['currentConditions']
-    today_wea = json_forecast['days']['data'][0]
-    tom_wea = json_forecast['days']['data'][1]
+    today_wea = json_forecast['days'][0]
+    tom_wea = json_forecast['days'][1]
 
     main_temp_unit = degc
     second_temp_unit = degf
@@ -327,11 +330,11 @@ def wcbase(bot, latitude, longitude, location):
         "wind_direction": degreeToDirection(current_weather['winddir']),
         "main_wind_speed": current_weather['windspeed'],
         "main_wind_unit": main_wind_unit,
-        "second_wind_speed": str(round(ms_to_mph(current_weather["windSpeed"]),1)),
+        "second_wind_speed": str(round(ms_to_mph(current_weather["windspeed"]),1)),
         "second_wind_unit": second_wind_unit,
         "humidity": current_weather['humidity'],
-        "main_feels_like": current_weather['feelsLike'],
-        "second_feels_like": str(round(c_to_f(current_weather['feelsLike']),1)),
+        "main_feels_like": current_weather['feelslike'],
+        "second_feels_like": str(round(c_to_f(current_weather['feelslike']),1)),
         "sunrise_time": current_weather['sunrise'],
         "sunset_time": current_weather['sunset']
     }
@@ -346,9 +349,9 @@ def wcbase(bot, latitude, longitude, location):
         "tom_summary": tom_wea['description'],
         "week_summary": json_forecast['description']
     }
-    wea_text = "{location}: {main_temp}{main_temp_unit} ({second_temp}{second_temp_unit}) {current_description}. \
-                Wind {wind_direction} {main_wind_speed} {main_wind_unit} ({second_wind_speed} {second_wind_unit}). \
-                Humidity: {humidity}. Feels like {main_feels_like} ({second_feels_like}) Sunrise: {sunrise_time} Sunset {sunset_time}".format(**now_format_dict)
+    wea_text = """{location}: {main_temp}{main_temp_unit} ({second_temp}{second_temp_unit}) {current_description}. \
+Wind {wind_direction} {main_wind_speed} {main_wind_unit} ({second_wind_speed} {second_wind_unit}). \
+Humidity: {humidity}. Feels like {main_feels_like} ({second_feels_like}) Sunrise: {sunrise_time} Sunset {sunset_time}""".format(**now_format_dict)
                     
     wf_text = 'Today: {today_min} to {today_max}{deg} {today_summary} Tomorrow: {tom_min} to {tom_max}{deg} {tom_summary} This Week: {week_summary}'.format(**two_day_format_dict)        
     
