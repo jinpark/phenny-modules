@@ -14,7 +14,8 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 import re
 from sopel import web, tools
 from sopel.module import commands, rule, example
-from sopel.config.types import ValidatedAttribute, StaticSection
+from sopel.config.types import ValidatedAttribute, StaticSection, ListAttribute
+from urllib.parse import urlparse, urlunparse
 
 
 url_finder = None
@@ -35,7 +36,7 @@ class UrlSection(StaticSection):
     # TODO some validation rules maybe?
     exclude = ValidatedAttribute('exclude')
     exclusion_char = ValidatedAttribute('exclusion_char', default='!')
-
+    replacers = ListAttribute('replacers')
 
 def configure(config):
     config.define_section('url', UrlSection)
@@ -46,6 +47,10 @@ def configure(config):
     config.url.configure_setting(
         'exclusion_char',
         'Enter a character which can be prefixed to suppress URL titling'
+    )
+    config.url.configure_setting(
+        'replacers',
+        'first to check, second to replace. ex twitter.com, nottwitter.com'
     )
 
 
@@ -152,14 +157,15 @@ def process_urls(bot, trigger, urls):
                 url = web.iri_to_uri(url)
             except:
                 pass
+            url = replace_url(bot, url)
             # First, check that the URL we got doesn't match
             matched = check_callbacks(bot, trigger, url, False)
             if matched:
-                continue
+                continue            
             # Then see if it redirects anywhere
             new_url = follow_redirects(url)
             if not new_url:
-                continue
+                continue            
             # Then see if the final URL matches anything
             matched = check_callbacks(bot, trigger, new_url, new_url != url)
             if matched:
@@ -180,7 +186,8 @@ def follow_redirects(url):
         connection = web.get_urllib_object(url, 60)
         url = connection.geturl() or url
         connection.close()
-    except:
+    except Exception as inst:
+        print(inst)
         return None
     return url
 
@@ -202,12 +209,23 @@ def check_callbacks(bot, trigger, url, run=True):
             matched = True
     return matched
 
+def replace_url(bot, url):
+    replacers = bot.config.url.replacers
+    replacer = [url for idx, url in enumerate(replacers) if idx % 2 == 0 ]
+    replacee = [url for idx, url in enumerate(replacers) if idx % 2 == 1 ]
+    parsed = urlparse(url)
+    if parsed.netloc in replacer:
+        idx = replacer.index(parsed.netloc)
+        replaced = parsed._replace(netloc=replacee[idx])
+        return urlunparse(replaced)
+    return url
 
 def find_title(url):
     """Return the title for the given URL."""
     try:
         content, headers = web.get(url, return_headers=True, limit_bytes=max_bytes)
     except UnicodeDecodeError:
+        print('get failed for url')
         return  # Fail silently when data can't be decoded
 
     # Some cleanup that I don't really grok, but was in the original, so
@@ -226,7 +244,6 @@ def find_title(url):
 
     # More cryptic regex substitutions. This one looks to be myano's invention.
     title = re_dcc.sub('', title)
-
     return title or None
 
 
