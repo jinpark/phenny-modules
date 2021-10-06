@@ -25,6 +25,8 @@ WEATHERSTACK_SEARCH_URL="http://api.weatherstack.com/current?access_key={}&units
 VISUALCROSSING_URL="https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{}?key={}&unitGroup={}"
 
 def degreeToDirection(deg):
+  if not (isinstance(deg, float) or isinstance(deg, int)):
+      return "?"
   if (337.5 <= deg <= 360) or (0 <= deg < 22.5):
     return "N"
   elif 22.5 <= deg < 67.5:
