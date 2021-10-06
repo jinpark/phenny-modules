@@ -26,7 +26,7 @@ VISUALCROSSING_URL="https://weather.visualcrossing.com/VisualCrossingWebServices
 
 def degreeToDirection(deg):
   if not (isinstance(deg, float) or isinstance(deg, int)):
-      return "?"
+    return "?"
   if (337.5 <= deg <= 360) or (0 <= deg < 22.5):
     return "N"
   elif 22.5 <= deg < 67.5:
@@ -363,6 +363,8 @@ def c_to_f(temp):
     return round(temp * 1.8 + 32, 2)
 
 def ms_to_mph(speed):
+    if not (isinstance(speed, float) or isinstance(speed, int)):
+        return "?"
     return speed * 2.23694
 
 def get_timezone(bot, lat, lon):
