@@ -69,5 +69,7 @@ def f_time(bot, trigger):
     offset = now.utcoffset().total_seconds()/60/60
     if offset > 0:
         offset = "+" + str(offset)
+    else:
+        offset = str(offset)
 
     bot.say(location + ": " + now.strftime("%F | %T %Z") + " | UTC " + offset)
