@@ -177,7 +177,7 @@ def weather_combined(bot, trigger):
                 return bot.msg(trigger.sender, "I don't know who this is or they don't have their location set.")
         else: 
             result = geocoder_search(bot, location)
-            if result["status"] is 'OK':
+            if result and result["status"] is 'OK':
                 woeid = result['address']
                 latitude = result['lat']
                 longitude = result['lng']
@@ -330,9 +330,9 @@ def wcbase(bot, latitude, longitude, location):
         "second_temp_unit": second_temp_unit,
         "current_description": current_weather['conditions'],
         "wind_direction": degreeToDirection(current_weather['winddir']),
-        "main_wind_speed": current_weather['windspeed'],
+        "main_wind_speed": current_weather['windspeed'] or  "?",
         "main_wind_unit": main_wind_unit,
-        "second_wind_speed": str(round(ms_to_mph(current_weather["windspeed"]),1)),
+        "second_wind_speed": ms_to_mph(current_weather["windspeed"]),
         "second_wind_unit": second_wind_unit,
         "humidity": current_weather['humidity'],
         "main_feels_like": current_weather['feelslike'],
@@ -365,7 +365,7 @@ def c_to_f(temp):
 def ms_to_mph(speed):
     if not (isinstance(speed, float) or isinstance(speed, int)):
         return "?"
-    return speed * 2.23694
+    return str(round(speed * 2.23694, 1))
 
 def get_timezone(bot, lat, lon):
     """ Not used anymore. Yahoo API returns it all """
