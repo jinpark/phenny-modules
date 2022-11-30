@@ -320,7 +320,7 @@ def wcbase(bot, latitude, longitude, location):
 
     main_temp_unit = degc
     second_temp_unit = degf
-    main_wind_unit = "m/s"
+    main_wind_unit = "km/h"
     second_wind_unit = "mph"
     now_format_dict = {
         "location": location,
