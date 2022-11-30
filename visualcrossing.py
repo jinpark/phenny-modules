@@ -332,7 +332,7 @@ def wcbase(bot, latitude, longitude, location):
         "wind_direction": degreeToDirection(current_weather['winddir']),
         "main_wind_speed": current_weather['windspeed'] or  "?",
         "main_wind_unit": main_wind_unit,
-        "second_wind_speed": ms_to_mph(current_weather["windspeed"]),
+        "second_wind_speed": kmph_to_mph(current_weather["windspeed"]),
         "second_wind_unit": second_wind_unit,
         "humidity": current_weather['humidity'],
         "main_feels_like": current_weather['feelslike'],
@@ -366,6 +366,11 @@ def ms_to_mph(speed):
     if not (isinstance(speed, float) or isinstance(speed, int)):
         return "?"
     return str(round(speed * 2.23694, 1))
+
+def kmph_to_mph(speed):
+    if not (isinstance(speed, float) or isinstance(speed, int)):
+        return "?"
+    return str(round(speed * 0.621371, 1))
 
 def get_timezone(bot, lat, lon):
     """ Not used anymore. Yahoo API returns it all """
