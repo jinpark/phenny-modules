@@ -23,7 +23,7 @@ requests==2.8.1
 six==1.10.0
 sopel==6.5.0
 update-checker==0.11
-wheel==0.32.3
+wheel==0.38.1
 wikiapi==1.2.4
 wolframalpha==3.0.1
 xmltodict==0.9.2
